@@ -1,0 +1,31 @@
+---
+title: "Análisis Avanzado de Datos con Inteligencia Artificial"
+author: "David Eduardo Sosa Olea"
+format: html
+editor: visual
+---
+
+# Script en R
+
+## Header
+
+El encabezado (header) de un script en R es una sección crucial que proporciona información esencial sobre el script, su propósito, requisitos previos, parámetros de la función, códigos de retorno, autor, fecha de creación, derechos de autor y cualquier otra información relevante. Este encabezado no solo facilita la comprensión del script a otras personas que puedan revisarlo, sino que también sirve como documentación para el propio desarrollador.
+
+## Carga de librerias
+
+la sección del script donde se están cargando los paquetes necesarios. En este caso, se están utilizando varias funciones y características de bibliotecas (paquetes) específicos para facilitar el manejo de datos.
+
+```{r}
+# Paquetes 
+library(readxl)
+library(tidyverse) 
+library(lubridate)
+library(fs)
+
+#| echo: false
+
+```
+
+```{r}
+
+```

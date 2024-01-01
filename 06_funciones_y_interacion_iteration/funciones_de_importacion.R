@@ -58,8 +58,17 @@ data_import <- function(dataSource) {
                    "Land_Area" = read_excel(
                        path = "01_Informacion_Data/Land_Area/LandArea.xlsx"
                    ),
+                   "Crime_rate" = read_rds(
+                      "01_Informacion_Data/Crime_Rates_by_ZipCodes/crime_rating_by_zip.R"
+                   ),
+                   "Demographis" = read_rds(
+                      "01_Informacion_Data/Crime_Rates_by_ZipCodes/Zip_Income_and_Poerverty.R"
+                       
+                   ),
                    "pop_data" = readRDS(file.path(my_dir, "pop_data.rds")),
                    stop("Dataset name not recognized.")
+
+                   
     )
     
     return(data)

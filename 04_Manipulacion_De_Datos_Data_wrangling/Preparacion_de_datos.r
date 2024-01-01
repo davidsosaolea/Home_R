@@ -176,4 +176,17 @@ CAGR <- CAGR |>                                 # Utiliza el marco de datos CAGR
 
 ## ROI AAR CAGR
 
+crime_rate <- data_import("Crime_rate")
+demographis <- data_import("Demographis")
 
+# MD
+
+ZMI_data_pre <- ZMI_data_pre|> mutate(RegionName = RegionName |> as.character())
+demographis <- demographis |> mutate(zip = zip |> as.character())
+
+MD <- ZMI_data_pre |> 
+    left_join(AAR,  by ="City_zip") |>
+    left_join(CAGR, by = "City_zip") |>
+    left_join(crime_rate, by = c("RegionName" = "Zipcode")) |>
+    left_join(demographis, by = c("RegionName" = "zip"))
+    

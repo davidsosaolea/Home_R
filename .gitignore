@@ -1,5 +1,19 @@
-# Created by https://www.toptal.com/developers/gitignore/api/r,windows,macos,linux
-# Edit at https://www.toptal.com/developers/gitignore?templates=r,windows,macos,linux
+# Created by https://www.toptal.com/developers/gitignore/api/windows,linux,macos,r,data
+# Edit at https://www.toptal.com/developers/gitignore?templates=windows,linux,macos,r,data
+
+### Data ###
+*.csv
+*.dat
+*.efx
+*.gbr
+*.key
+*.pps
+*.ppt
+*.pptx
+*.sdf
+*.tax2010
+*.vcf
+*.xml
 
 ### Linux ###
 *~
@@ -130,4 +144,4 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.toptal.com/developers/gitignore/api/r,windows,macos,linux
+# End of https://www.toptal.com/developers/gitignore/api/windows,linux,macos,r,data

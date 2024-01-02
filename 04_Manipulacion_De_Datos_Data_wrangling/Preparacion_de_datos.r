@@ -189,4 +189,21 @@ MD <- ZMI_data_pre |>
     left_join(CAGR, by = "City_zip") |>
     left_join(crime_rate, by = c("RegionName" = "Zipcode")) |>
     left_join(demographis, by = c("RegionName" = "zip"))
-    
+
+MD |> miss_case_summary()
+MD |> gg_miss_var()
+
+# check <- MD |> filter(is.na(`Overall Crime Grade`) == TRUE)
+MD <- MD |> filter(!is.na(`Overall Crime Grade`) == TRUE)
+
+# MD |> na.omit()
+# test <- MD
+# test[1,2] <- NA
+# test |> na.omit()
+
+# Filter
+check <- MD |> filter(CAGR > 0.04 & Z_Home_Value_Index < 300000 & familyPercentPoverty < 12)
+
+# Employment
+
+Employment <- data_import("Employment")

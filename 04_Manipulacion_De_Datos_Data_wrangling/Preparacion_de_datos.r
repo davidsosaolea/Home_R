@@ -207,3 +207,24 @@ check <- MD |> filter(CAGR > 0.04 & Z_Home_Value_Index < 300000 & familyPercentP
 # Employment
 
 Employment <- data_import("Employment")
+
+Employment |> miss_case_summary()
+Employment |> gg_miss_var(facet = Year)
+
+Employment_C <- Employment |> gather(key = "Month", value = "Employment",  Jan:Dec) |>
+    filter(Employment != is.na(Employment)) |>
+    select(Year, Employment) |>
+    group_by(Year) |>
+    summarise(Employment = Employment |> mean()) |>
+    mutate(Employment_lag1 = lag(Employment,1)) |>
+    
+#    mutate(Employment_lag1 = coalesce(Employment_lag1, Employment))
+
+     mutate(Employment_lag1 = case_when(
+         
+         is.na(Employment_lag1) ~ Employment,
+         TRUE ~ Employment_lag1
+     )) |>
+    mutate(diff_1 = Employment - Employment_lag1) |>
+    mutate(PC_YoY = diff_1/Employment_lag1) |>
+    mutate(PC_YoY_chr = scales::percent(PC_YoY) )

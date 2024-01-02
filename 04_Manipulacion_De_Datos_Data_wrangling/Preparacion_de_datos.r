@@ -218,7 +218,7 @@ Employment_C <- Employment |> gather(key = "Month", value = "Employment",  Jan:D
     summarise(Employment = Employment |> mean()) |>
     mutate(Employment_lag1 = lag(Employment,1)) |>
     
-#    mutate(Employment_lag1 = coalesce(Employment_lag1, Employment))
+#   mutate(Employment_lag1 = coalesce(Employment_lag1, Employment))
 
      mutate(Employment_lag1 = case_when(
          
@@ -228,3 +228,8 @@ Employment_C <- Employment |> gather(key = "Month", value = "Employment",  Jan:D
     mutate(diff_1 = Employment - Employment_lag1) |>
     mutate(PC_YoY = diff_1/Employment_lag1) |>
     mutate(PC_YoY_chr = scales::percent(PC_YoY) )
+
+# Data store
+
+write_rds(ZMI_data_pre, file = "01_Informacion_Data/Bureau_Labor_of_Statistics_Data/ZMI_data_pre.rds")
+write_rds(Employment_C, "01_Informacion_Data/Zillow/Employment_C.rds")

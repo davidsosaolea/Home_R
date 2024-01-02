@@ -65,6 +65,14 @@ data_import <- function(dataSource) {
                       "01_Informacion_Data/Crime_Rates_by_ZipCodes/Zip_Income_and_Poerverty.R"
                        
                    ),
+                   "ZMI_data_pre" = read_rds(
+                       "01_Informacion_Data/Bureau_Labor_of_Statistics_Data/ZMI_data_pre.rds"
+                       
+                   ),
+                   "Employment_C" = read_rds(
+                       "01_Informacion_Data/Zillow/Employment_C.rds"
+                       
+                   ),
                    "pop_data" = readRDS(file.path(my_dir, "pop_data.rds")),
                    stop("Dataset name not recognized.")
 

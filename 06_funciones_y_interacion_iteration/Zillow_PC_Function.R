@@ -85,3 +85,6 @@ getTopCitiesByCAGR <- function (Y1, Y2, show_rows){
    }else
        print("Ingrese 'all' o un valor numerico")
 }
+
+
+#getTopCitiesByCAGR(2000, 2019, 3)

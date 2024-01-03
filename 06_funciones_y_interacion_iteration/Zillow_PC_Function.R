@@ -78,13 +78,15 @@ getTopCitiesByCAGR <- function (Y1, Y2, show_rows){
        CAGR <- CAGR[1:show_rows,]
        return(CAGR)
    }
-   if (is.numeric(show_rows) == TRUE) {
+   
+   n <- CAGR |> nrow()
+   if (is.numeric(show_rows) == TRUE & show_rows < n+1) {
        CAGR <- CAGR [1: show_rows,]
        return(CAGR)
        
    }else
-       print("Ingrese 'all' o un valor numerico")
+       print(str_glue("Ingrese 'all' o un valor numerico entre 0 y {n}"))
 }
 
 
-#getTopCitiesByCAGR(2000, 2019, 3)
+# getTopCitiesByCAGR(2000, 2019, 170)

@@ -57,56 +57,12 @@ library(ggrepel)
 source("06_funciones_y_interacion_iteration/Zillow_PC_Function.R")
 source("06_funciones_y_interacion_iteration/funciones_de_importacion.R")
 
+CAGR_Data <- getTopCitiesByCAGR(2000,2022,30)
+ZMI_Data_Prep <- data_import("ZMI_data_pre")
 
+ZillowTrends <- CAGR_Data |> left_join(ZMI_Data_Prep, by = "City_zip")
 
+ZillowTrends |> gg_miss_var()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ZillowTrends <- ZillowTrends |>
+    select (City_zip, Year, Z_Home_Value_Index, ZHVI_PC_YoY, ZHVI_PC_YoY_chr, timeperiod, Number_of_Years)

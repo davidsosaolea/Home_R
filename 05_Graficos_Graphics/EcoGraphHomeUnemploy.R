@@ -80,8 +80,13 @@ max_y <- ZillowTrends |>
     pull (Year) |>
     max()
 
+ZillowTrends <- ZillowTrends |>
+    mutate(tool_tip = str_glue("CityZip: {City_zip},
+                               %Change: {ZHVI_PC_YoY_chr},
+                               Year: {Year}"))
+
 # Grafico/Plot
-g <- ZillowTrends |> ggplot(aes (x = Year, y = ZHVI_PC_YoY, color = City_zip)) +
+g <- ZillowTrends |> ggplot(aes (x = Year, y = ZHVI_PC_YoY, color = City_zip, text = tool_tip, group = City_zip )) +
     geom_line(linewidth = 1) +
     geom_point(size = 2, alpha = 0.5) +
     geom_hline(yintercept = 0, linetype = "dashed", color = "black", linewidth = 0.50) +
@@ -93,4 +98,30 @@ g <- ZillowTrends |> ggplot(aes (x = Year, y = ZHVI_PC_YoY, color = City_zip)) +
         y = "Percentage Change (%)",
         caption = str_glue("From {min_y} to {max_y}, the average CAGR has been {ave_rate} \n for these top 30 ZipCodes in the Metro Detroit Area")
     )
-g |> ggplotly()
+g |> ggplotly(tooltip = "tool_tip") 
+
+
+
+########################
+
+
+# # Ordena los datos por Year para asegurar que las líneas estén conectadas en orden temporal
+# ZillowTrends <- ZillowTrends |> arrange(Year)
+# 
+# # Grafico/Plot
+# g <- ZillowTrends |> ggplot(aes(x = Year, y = ZHVI_PC_YoY, color = City_zip, text = str_glue("CityZip: {City_zip}, %Change: {ZHVI_PC_YoY_chr}, Year: {Year}"))) +
+#     geom_line(aes(group = City_zip), linewidth = 1) +
+#     geom_point(size = 2, alpha = 0.5) +
+#     geom_hline(yintercept = 0, linetype = "dashed", color = "black", linewidth = 0.50) +
+#     labs(
+#         title = "Home Prices Appreciation Year over Year",
+#         subtitle = str_glue("Percentage change YoY from {min_y} to {max_y}"),
+#         x = "YEAR",
+#         y = "Percentage Change (%)",
+#         caption = str_glue("From {min_y} to {max_y}, the average CAGR has been {ave_rate} \n for these top 30 ZipCodes in the Metro Detroit Area")
+#     )
+# 
+# # Utiliza ggplotly con tooltip
+# g |> ggplotly()
+
+

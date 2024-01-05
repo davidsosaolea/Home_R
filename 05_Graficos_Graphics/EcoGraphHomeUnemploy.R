@@ -93,3 +93,4 @@ g <- ZillowTrends |> ggplot(aes (x = Year, y = ZHVI_PC_YoY, color = City_zip)) +
         y = "Percentage Change (%)",
         caption = str_glue("From {min_y} to {max_y}, the average CAGR has been {ave_rate} \n for these top 30 ZipCodes in the Metro Detroit Area")
     )
+g |> ggplotly()

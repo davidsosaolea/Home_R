@@ -173,6 +173,8 @@ p3 <- homev_vs_Job_growth |>
     geom_point(aes(text = label_text), size = 2) +
     geom_hline(yintercept = 0, linetype = "dashed", color = "gray0", size = 0.50)
 
+p3
+
 #####
 # Si prefieres que el dataframe resultante ya no esté agrupado, puedes usar unmutate
 df <- ZMI_Data_Prep %>%

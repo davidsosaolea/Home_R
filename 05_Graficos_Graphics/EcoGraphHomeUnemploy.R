@@ -179,8 +179,33 @@ p3 <- homev_vs_Job_growth |>
         y = "Percetage Change (%)",
         caption = str_glue("Data Sources are from 'Zillow' & 'Bureau of Labor Statistics'.
         Employment data is from the area of Detroit-Warren-Dearborn Employment. 
-        In The Home Value Index is the mean of the change of {num_of_zip} ZipCodes in the Detroit-Warren-Dearborn area'"
-    ))
+        The Home Value Index is the mean of the change of {num_of_zip} ZipCodes in the Detroit-Warren-Dearborn area'"
+    ))+
+    theme_light()
+
+p3 |> ggplotly(tooltip = "text")
+
+
+## Themes
+
+p3
+
+RColorBrewer::display.brewer.all()
+
+p3 + scale_colour_brewer(palette = "Set1")
+p3 + scale_colour_brewer(palette = "Set2")
+p3 + scale_colour_brewer (palette = "Pastel1")
+p3 + scale_colour_brewer (palette = "Dark2")
+
+p3 + theme_dark() + scale_colour_manual(values = c("blue gold"))
+p3 + theme (
+    
+    plot.title    = element_text(color="dark blue", size = 12, face = "bold"),
+    plot.subtitle = element_text(color="dark blue", size = 10, face = "italic"),
+    plot.caption  = element_text(color="dark blue", size = 8, face = "bold.italic")
+)    
+    
+p3 + lims(x = c(2001, 2022))
 
 
 

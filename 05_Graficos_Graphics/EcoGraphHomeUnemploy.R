@@ -171,9 +171,18 @@ p3 <- homev_vs_Job_growth |>
     
     geom_line(linewidth = 1) +
     geom_point(aes(text = label_text), size = 2) +
-    geom_hline(yintercept = 0, linetype = "dashed", color = "gray0", size = 0.50)
+    geom_hline(yintercept = 0, linetype = "dashed", color = "gray0", size = 0.50)+
 
-p3
+    labs(
+        title = "Home Prices vs Employment",
+        subtitle = "Percentage Change YoY between Home Prices & Employment",
+        y = "Percetage Change (%)",
+        caption = str_glue("Data Sources are from 'Zillow' & 'Bureau of Labor Statistics'.
+        Employment data is from the area of Detroit-Warren-Dearborn Employment. 
+        In The Home Value Index is the mean of the change of {num_of_zip} ZipCodes in the Detroit-Warren-Dearborn area'"
+    ))
+
+
 
 #####
 # Si prefieres que el dataframe resultante ya no esté agrupado, puedes usar unmutate

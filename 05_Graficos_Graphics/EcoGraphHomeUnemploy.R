@@ -197,7 +197,7 @@ p3 + scale_colour_brewer(palette = "Set2")
 p3 + scale_colour_brewer (palette = "Pastel1")
 p3 + scale_colour_brewer (palette = "Dark2")
 
-p3 + theme_dark() + scale_colour_manual(values = c("blue gold"))
+p3 + theme_dark() + scale_colour_manual(values = c("blue","gold"))
 p3 + theme (
     
     plot.title    = element_text(color="dark blue", size = 12, face = "bold"),
@@ -208,12 +208,87 @@ p3 + theme (
 p3 + lims(x = c(2001, 2022))
 
 
+# Plot4
+## LOESS Regression
+## (LOESS) Local Polynomial Regression
 
-#####
-# Si prefieres que el dataframe resultante ya no esté agrupado, puedes usar unmutate
-df <- ZMI_Data_Prep %>%
-    group_by(Year) %>%
-    mutate(cambio2 = mean(ZHVI_PC_YoY, na.rm = TRUE)) %>%
-    ungroup()
+homev_vs_Job_growth_II <- Employment_C |>
+    left_join(avg_zhvi_pc_by_year, by = "Year") |>
+    select(Year, PC_YoY, "Home Value Index") |>
+    mutate (Employment = PC_YoY) |>
+    mutate(Home_Value_Index = `Home Value Index`) |>
+    filter (Year > 1999)
+##########################
+# Establecer una semilla para reproducibilidad
+set.seed(123)
+
+# Ajustar un modelo loess con un parámetro de suavidad (span) personalizado
+mod <- loess(Home_Value_Index ~ Employment, data = homev_vs_Job_growth_II)
+
+# Crear un conjunto de datos de la cuadrícula para las predicciones
+grid <- tibble(Employment = seq(min(homev_vs_Job_growth_II$Employment), max(homev_vs_Job_growth_II$Employment), length = 50))
+grid$Home_Value_Index <- predict(mod, newdata = grid)
+
+# Calcular residuos estandarizados
+std_resid <- resid(mod) / mod$s
+
+# Identificar outliers
+outlier <- filter(homev_vs_Job_growth_II, abs(std_resid) > 1)
+
+# Crear el gráfico
+p4 <- ggplot(homev_vs_Job_growth_II, aes(Employment, Home_Value_Index)) +
+    geom_point() +
+    geom_line(data = grid, colour = "blue", size = 1.5) + 
+    ggrepel::geom_text_repel(data = outlier, aes(label = Year), color = "red") +
+    labs(
+        title = "LOESS Regression",
+        y = "Home Value Index",
+        x = "Employment",
+        caption = "LOESS regression, sometimes called local regression, is a method that uses local fitting to fit a regression model to a dataset"
+    ) +
+    theme_minimal()  # Puedes cambiar a theme_light() u otros temas según tu preferencia
+
+# Añadir anotaciones al gráfico
+p4 + annotate(
+    geom = "curve",
+    x = -0.10,
+    y = 0.09,
+    xend = -0.106,
+    yend = 0.055,
+    curvature = 0.3,
+    arrow = arrow(length = unit(2, "mm"))
+) +
+    annotate(geom = "text", x = -0.10, y = 0.09, label = "Global Pandemic", hjust = "left")
 
 
+#######################
+mod <- loess(Home_Value_Index ~ Employment, data = homev_vs_Job_growth_II)
+grid <- tibble (Employment = seq(min(homev_vs_Job_growth_II$Employment), max(homev_vs_Job_growth_II$Employment), length = 50))
+grid$Home_Value_Index <- predict(mod, newdata = grid)
+
+std_resid <- resid (mod)/mod$s
+outlier   <- filter (homev_vs_Job_growth_II, abs(std_resid) > 1)
+outlier
+
+p4 <- ggplot(homev_vs_Job_growth_II, aes(Employment, Home_Value_Index)) +
+    geom_point() +
+    geom_line(data = grid, colour = "blue", size = 1.5) + 
+    ggrepel::geom_text_repel(data = outlier, aes (label = Year)) +
+    
+    labs (
+        title = "LOESS Regression",
+        y = "Avg % Change Home Value Index",
+        x = "Avg % Change Employment",
+        caption = "LOESS regression, sometimes called local regression, 
+        is a method that uses local fitting to fit a regression model to a dataset"
+        )
+
+homev_vs_Job_growth_II |> tail()
+
+p4 + annotate(geom = "curve",
+              x = -0.10,
+              y = 0.09,
+              xend = -0.106,
+              yend = 0.055,
+              curvature = 0.3, arrow = arrow (length = unit(2, "mm"))) +
+    annotate(geom = "text", x = -0.10, y = 0.09, label = "Global Pandemic", hjust = "left")

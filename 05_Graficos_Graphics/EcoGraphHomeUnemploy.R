@@ -292,3 +292,33 @@ p4 + annotate(geom = "curve",
               yend = 0.055,
               curvature = 0.3, arrow = arrow (length = unit(2, "mm"))) +
     annotate(geom = "text", x = -0.10, y = 0.09, label = "Global Pandemic", hjust = "left")
+
+
+
+## LOESS & ggplotly
+homev_vs_Job_growth_II <- homev_vs_Job_growth_II |>
+    mutate (Home_Value_Index_ch = Home_Value_Index |> scales::percent (accuracy = 0.01)) |>
+    mutate (Employment_ch = PC_YoY |> scales::percent (accuracy = 0.01)) |>
+    mutate (label_text  = str_glue("Year: {Year},
+                                   Home Value Index: {Home_Value_Index_ch},
+                                   Employment: {Employment_ch}"))
+
+p4 <- ggplot(homev_vs_Job_growth_II, aes(Employment, Home_Value_Index)) +
+    geom_point(aes(text = label_text), size = 2) +
+    geom_line(data = grid, colour = "blue", size = 1.5) + 
+    ggrepel::geom_text_repel(data = outlier, aes (label = Year)) +
+    
+    labs (
+        title = "LOESS Regression",
+        y = "Avg % Change Home Value Index",
+        x = "Avg % Change Employment",
+        caption = "LOESS regression, sometimes called local regression, 
+        is a method that uses local fitting to fit a regression model to a dataset"
+    ) +
+    scale_y_continuous(labels = scales::percent) +
+    scale_x_continuous(labels = scales::percent) 
+
+p4 |>
+    ggplotly(tooltip = "text")
+
+

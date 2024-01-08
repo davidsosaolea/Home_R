@@ -336,7 +336,7 @@ homev_vs_Job_growth_III <- homev_vs_Job_growth_III |>
     mutate (Employment_PC       =  PC_YoY |> scales::percent (accuracy = 0.01)) |>
     mutate (label_text1         = str_glue("Employment: (Employment_PC}%")) |>
     mutate (label_text2         = str_glue("Home Value Index: {Home_Value_Index_PC} %")) |>
-    mutate(label_text3          = str_glue("E: [Employment_PC}%")) |>
+    mutate(label_text3          = str_glue("E: {Employment_PC}%")) |>
     mutate(label_text4          = str_glue("H: {Home_Value_Index_PC}%"))
 
 miny <- homev_vs_Job_growth_III |>
@@ -345,7 +345,7 @@ miny <- homev_vs_Job_growth_III |>
 max_y <- homev_vs_Job_growth_III |>
     pull (Year) |> max()
 
-ggplot(homev_vs_Job_growth_III) +
+p5 <- ggplot(homev_vs_Job_growth_III) +
     geom_bar(aes (Year, Employment, text = label_text1),
              stat     = "identity",
              position = "dodge",
@@ -359,10 +359,26 @@ ggplot(homev_vs_Job_growth_III) +
              color    = "black",
              alpha    =  0.3)+
     scale_y_continuous (labels = scales::percent)+
-
-
-labs (
+    
+    labs (
     title = "Home Prices vs Employment",
     caption = str_glue("Data sources: Zillow & Bureau Labor of Statistics
                        Timeframe: {min_y} {max_y}")
-)
+    )+
+    geom_label(aes (Year, Employment, label = label_text3),
+           hjust = "left",
+           vjust = "top",
+           size = 3) +
+    geom_label(aes (Year, Home_Value_Index, label = label_text4),
+               hjust = "right",
+               vjust = "bottom",
+               size = 3)
+
+p5 |> 
+    ggplotly (tooltip = "text") |>
+    layout (title = list(text = paste('Home Prices vs Employment',
+                                      '<br>',
+                                      '<sup>',
+                                      '<b>','Data sources:',
+                                      '</b>', "(Zillow) & (Bereau Labor of Statistics)",
+                                      '</sup>')))

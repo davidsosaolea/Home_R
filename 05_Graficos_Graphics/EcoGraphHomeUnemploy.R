@@ -334,8 +334,8 @@ homev_vs_Job_growth_III <- Employment_C |>
 homev_vs_Job_growth_III <- homev_vs_Job_growth_III |>
     mutate (Home_Value_Index_PC = `Home Value Index` |> scales:: percent (accuracy = 0.01)) |> 
     mutate (Employment_PC       =  PC_YoY |> scales::percent (accuracy = 0.01)) |>
-    mutate (label_text1         = str_glue("Employment: (Employment_PC}%")) |>
-    mutate (label_text2         = str_glue("Home Value Index: {Home_Value_Index_PC} %")) |>
+    mutate (label_text1         = str_glue("Employment: (Employment_PC}")) |>
+    mutate (label_text2         = str_glue("Home Value Index: {Home_Value_Index_PC}")) |>
     mutate(label_text3          = str_glue("E: {Employment_PC}%")) |>
     mutate(label_text4          = str_glue("H: {Home_Value_Index_PC}%"))
 

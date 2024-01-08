@@ -382,3 +382,45 @@ p5 |>
                                       '<b>','Data sources:',
                                       '</b>', "(Zillow) & (Bereau Labor of Statistics)",
                                       '</sup>')))
+
+
+
+# Plot6
+## 80/20
+# Preparing the data
+CAGR_Data_zip <- CAGR_Data |>
+    mutate (zip = str_extract (City_zip, pattern = "\\d{5}")) |>
+    mutate (zip = zip |> as.integer())
+
+demographis <- data_import(dataSource = "Demographis")
+
+demographis_CAGR <-  CAGR_Data_zip |> left_join(demographis, by="zip")
+
+demographis_CAGR |> glimpse()
+
+
+demographis_CAGR  <- demographis_CAGR |>
+    mutate(label_text = str_glue("House Hold Median Income: {House_Hold_Median_Income |> scales::dollar()}"))
+
+p6 <- ggplot(demographis_CAGR, aes(x = reorder (City_zip, -House_Hold_Median_Income))) +
+    geom_bar(aes(y = House_Hold_Median_Income, text = label_text),
+             stat = "identity",
+             color = "black", fill = "skyblue") +
+    scale_y_continuous (name = "Median Income", labels = scales::dollar) +
+    labs (
+        x = "ZipCode"
+    ) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90))
+
+p6 |>
+    ggplotly(tooltip = "label_text") |>
+    layout(title = list(text = paste0('<br>',
+                                 'House Hold Median Income',
+                                 '</br>',
+                                 '<br>',
+                                 '<sup>',
+                                 '<b>',
+                                 'Note:',
+                                 '</b>', 'These ZipCodes have the higher CAGR in Metro Detroit',
+                                 '</sup>')))

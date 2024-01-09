@@ -424,3 +424,89 @@ p6 |>
                                  'Note:',
                                  '</b>', 'These ZipCodes have the higher CAGR in Metro Detroit',
                                  '</sup>')))
+##plot7
+Y1 <-  2010
+Y2 <-  2023
+CAGR_Data2 <- getTopCitiesByCAGR (Y1 = Y1, Y2 = Y2, show_rows = 30)
+
+CAGR_Data2 <- CAGR_Data2 |>
+    mutate(CumulativeCAGR = cumsum (CAGR)) |>
+    mutate (CumulativePercent = CumulativeCAGR / sum (CAGR)) |>
+    mutate(CAGR_chr = CAGR |> scales:: percent (accuracy = 0.01)) |>
+    mutate(CAGR_chr = str_glue("CAGR: {CAGR_chr} 
+                               Data from {Y1} to {Y2}")) |>
+    
+    mutate (Label = str_glue("Location: {City_zip},
+                             CumulativePercent: {CumulativePercent |> scales::percent()}"))
+
+pareto_chart <- ggplot(CAGR_Data2, aes (x = reorder (City_zip, ~ CAGR), y= CAGR)) +
+    geom_bar(aes (text = CAGR_chr),
+             stat = "identity",
+             fill = "skyblue") +
+    
+    geom_line(aes (y = CumulativePercent, group = 1, text = Label), colour = "red", size = 1) + 
+    geom_point(aes(y = CumulativePercent, group = 1, text = Label), colour = "red", size = 2) +
+    scale_y_continuous (name = "CAGR (%)",
+                        sec.axis = sec_axis(~ . , name = "Cumulative %"),
+                        labels = scales::percent) +
+    
+    labs(
+        x = "ZipCode",
+        title = "Pareto Chart of CAGR by ZipCode"
+        )+
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90))
+
+
+ggplotly(pareto_chart, tooltip = "text")
+
+#########
+library(dplyr)
+library(ggplot2)
+library(ggplotly)
+library(scales)
+
+Y1 <- 2010
+Y2 <- 2023
+CAGR_Data2 <- getTopCitiesByCAGR(Y1 = Y1, Y2 = Y2, show_rows = 30)
+
+CAGR_Data2 <- CAGR_Data2 |>
+    mutate(
+        CumulativeCAGR = cumsum(CAGR),
+        CumulativePercent = CumulativeCAGR / sum(CAGR),
+        CAGR_chr = CAGR |> scales::percent(accuracy = 0.01),
+        CombinedLabel = str_glue("CAGR: {CAGR_chr}, Data from {Y1} to {Y2}, Location: {City_zip}, CumulativePercent: {CumulativePercent |> scales::percent()}")
+    )
+
+# Truncar las etiquetas a una longitud fija (ajusta según sea necesario)
+max_label_length <- 200
+CAGR_Data2$CombinedLabel <- substr(CAGR_Data2$CombinedLabel, 1, max_label_length)
+
+pareto_chart <- ggplot(CAGR_Data2, aes(x = reorder(City_zip, ~CAGR), y = CAGR)) +
+    geom_bar(fill = "skyblue") +
+    geom_line(aes(y = CumulativePercent), color = "red", size = 1) +
+    geom_point(aes(y = CumulativePercent), color = "red", size = 2) +
+    scale_y_continuous(
+        name = "CAGR (%)",
+        sec.axis = sec_axis(~., name = "Cumulative %"),
+        labels = scales::percent
+    ) +
+    labs(
+        x = "ZipCode",
+        title = "Pareto Chart of CAGR by ZipCode"
+    ) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90))
+
+# Anotar con etiquetas
+annotations <- CAGR_Data2 %>%
+    group_by(City_zip) %>%
+    filter(row_number() == n()) %>%
+    ungroup() %>%
+    mutate(Label = str_glue("CAGR: {CAGR_chr}\nData from {Y1} to {Y2}\nLocation: {City_zip}\nCumulativePercent: {CumulativePercent |> scales::percent()}"))
+
+pareto_chart <- pareto_chart +
+    annotate("text", x = annotations$City_zip, y = annotations$CAGR, label = annotations$Label, vjust = -1, hjust = 0, color = "black", size = 3)
+
+ggplotly(pareto_chart, tooltip = "text")
+

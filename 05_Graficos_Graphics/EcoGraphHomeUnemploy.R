@@ -430,16 +430,16 @@ Y2 <-  2023
 CAGR_Data2 <- getTopCitiesByCAGR (Y1 = Y1, Y2 = Y2, show_rows = 30)
 
 CAGR_Data2 <- CAGR_Data2 |>
-    mutate(CumulativeCAGR = cumsum (CAGR)) |>
-    mutate (CumulativePercent = CumulativeCAGR / sum (CAGR)) |>
-    mutate(CAGR_chr = CAGR |> scales:: percent (accuracy = 0.01)) |>
-    mutate(CAGR_chr = str_glue("CAGR: {CAGR_chr} 
-                               Data from {Y1} to {Y2}")) |>
+    mutate(CumulativeCAGR    = cumsum (CAGR)) |>
+    mutate(CumulativePercent = CumulativeCAGR / sum (CAGR)) |>
+    mutate(CAGR_chr          = CAGR |> scales:: percent (accuracy = 0.01)) |>
+    mutate(CAGR_chr          = str_glue("CAGR: {CAGR_chr} 
+                                        Data from {Y1} to {Y2}")) |>
     
-    mutate (Label = str_glue("Location: {City_zip},
+    mutate(Label = str_glue("Location: {City_zip},
                              CumulativePercent: {CumulativePercent |> scales::percent()}"))
 
-pareto_chart <- ggplot(CAGR_Data2, aes (x = reorder (City_zip, ~ CAGR), y= CAGR)) +
+pareto_chart <- ggplot(CAGR_Data2, aes (x = reorder (City_zip, - CAGR), y = CAGR)) +
     geom_bar(aes (text = CAGR_chr),
              stat = "identity",
              fill = "skyblue") +
@@ -451,9 +451,9 @@ pareto_chart <- ggplot(CAGR_Data2, aes (x = reorder (City_zip, ~ CAGR), y= CAGR)
                         labels = scales::percent) +
     
     labs(
-        x = "ZipCode",
+        x     = "ZipCode",
         title = "Pareto Chart of CAGR by ZipCode"
-        )+
+    )+
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 90))
 
@@ -461,52 +461,51 @@ pareto_chart <- ggplot(CAGR_Data2, aes (x = reorder (City_zip, ~ CAGR), y= CAGR)
 ggplotly(pareto_chart, tooltip = "text")
 
 #########
-library(dplyr)
-library(ggplot2)
-library(ggplotly)
-library(scales)
+#####plot8
+# Data Preparation
+data <- data.frame(
+    Category = c("Dose Missed",
+                 "Wrong Time",
+                 "Overdose",
+                 "Wrong Patient",
+                 "Wrong Drug",
+                 "Wrong Calculation",
+                 "Duplicated Dose",
+                 "Under Dose",
+                 "Wrong Rate",
+                 "Technique Error",
+                 "Unathorized Drug"),
+    Frequency = c(92, 83, 76, 59, 53, 27, 16, 9, 7, 4, 3)
 
-Y1 <- 2010
-Y2 <- 2023
-CAGR_Data2 <- getTopCitiesByCAGR(Y1 = Y1, Y2 = Y2, show_rows = 30)
+)
 
-CAGR_Data2 <- CAGR_Data2 |>
-    mutate(
-        CumulativeCAGR = cumsum(CAGR),
-        CumulativePercent = CumulativeCAGR / sum(CAGR),
-        CAGR_chr = CAGR |> scales::percent(accuracy = 0.01),
-        CombinedLabel = str_glue("CAGR: {CAGR_chr}, Data from {Y1} to {Y2}, Location: {City_zip}, CumulativePercent: {CumulativePercent |> scales::percent()}")
-    )
+data <- data |>
+    arrange (desc (Frequency)) |>
+    mutate (Cumulative = cumsum(Frequency)) |>
+    mutate (Cumulative_Percent = Cumulative / sum (Frequency) * 100)
 
-# Truncar las etiquetas a una longitud fija (ajusta según sea necesario)
-max_label_length <- 200
-CAGR_Data2$CombinedLabel <- substr(CAGR_Data2$CombinedLabel, 1, max_label_length)
 
-pareto_chart <- ggplot(CAGR_Data2, aes(x = reorder(City_zip, ~CAGR), y = CAGR)) +
-    geom_bar(fill = "skyblue") +
-    geom_line(aes(y = CumulativePercent), color = "red", size = 1) +
-    geom_point(aes(y = CumulativePercent), color = "red", size = 2) +
-    scale_y_continuous(
-        name = "CAGR (%)",
-        sec.axis = sec_axis(~., name = "Cumulative %"),
-        labels = scales::percent
-    ) +
-    labs(
-        x = "ZipCode",
-        title = "Pareto Chart of CAGR by ZipCode"
-    ) +
-    theme_minimal() +
-    theme(axis.text.x = element_text(angle = 90))
+p <- ggplot(data, aes (x = reorder (Category, -Frequency), y = Frequency)) +
+    geom_bar(aes (text = paste("Category:", Category, "<br>Frequency:", Frequency)),
+             stat = "identity",
+             fill = "blue") +
+    geom_line(aes (y = Cumulative_Percent,
+                   group = 1,
+                   text = paste("Category:", Category, "<br>Cumulative %:", sprintf("%.2f", Cumulative_Percent))),
+              colour = "red") +
+geom_point(aes (y = Cumulative_Percent,
+                text = paste("Category:", Category, "<br>Cumulative %:", sprintf("%.2f", Cumulative_Percent))),
+                colour = "red") +
+    geom_hline(aes (yintercept = 80), linetype = "dashed", color = "green")+
+    
+               scale_y_continuous (sec.axis = sec_axis(~ ., name = "Cumulative %")) +
+                   theme_minimal() +
+                   labs (
+                       x = "Type of Medication Errors",
+                       y = "Frequency #",
+                       title = str_glue("Pareto Chart Types of Medication Errors (n = {data$Frequency |> sum()})")
+                   )+
+    theme (axis.text.x = element_text (angle = 45, hjust = 1))
 
-# Anotar con etiquetas
-annotations <- CAGR_Data2 %>%
-    group_by(City_zip) %>%
-    filter(row_number() == n()) %>%
-    ungroup() %>%
-    mutate(Label = str_glue("CAGR: {CAGR_chr}\nData from {Y1} to {Y2}\nLocation: {City_zip}\nCumulativePercent: {CumulativePercent |> scales::percent()}"))
-
-pareto_chart <- pareto_chart +
-    annotate("text", x = annotations$City_zip, y = annotations$CAGR, label = annotations$Label, vjust = -1, hjust = 0, color = "black", size = 3)
-
-ggplotly(pareto_chart, tooltip = "text")
-
+p |>
+    ggplotly(tooltip = "text")

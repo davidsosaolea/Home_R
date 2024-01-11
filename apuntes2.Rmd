@@ -13,7 +13,6 @@ output:
     df_print: paged
     code_folding: show
 ---
-
 # Introducción
 
 ## ¿Que es R?
@@ -26,29 +25,16 @@ La importación de datos es un proceso crucial en cualquier análisis de datos, 
 
 ## Importación de Datos (TSV , Excel, CSV, SQL)
 
--   **Excel**: Para importar datos desde archivos Excel, el paquete readxl o openxlsx es comúnmente utilizado
-
-```{r, message=FALSE , warning=FALSE, rows.print = 5}
-
-# Especificar la ruta del archivo Excel
-ruta_archivo <- "01_Informacion_Data/Bureau_Labor_of_Statistics_Data/Detroit_Warren_Dearborn.xlsx"
-
-library(openxlsx)
-# Leer datos desde la primera hoja del archivo Excel
-data <- read.xlsx(ruta_archivo, sheet = 1)
-print(data)
-
-```
-
+-   Excel: Para importar datos desde archivos Excel, el paquete readxl o openxlsx es comúnmente utilizado
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 library(readxl)
 Employment <- read_excel(
-    path = ruta_archivo,
+    path = "01_Informacion_Data/Bureau_Labor_of_Statistics_Data/Detroit_Warren_Dearborn.xlsx",
     sheet = "BLS Data Series",
     skip = 10
 )
-print(Employment)
+Employment
 ```
 
 ## Extracción de Datos de Archivos zip

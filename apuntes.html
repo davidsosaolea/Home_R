@@ -118,195 +118,47 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </ul>
 <div class="cell" data-rows.print="5">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Especificar la ruta del archivo Excel</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>ruta_archivo <span class="ot">&lt;-</span> <span class="st">"01_Informacion_Data/Bureau_Labor_of_Statistics_Data/Detroit_Warren_Dearborn.xlsx"</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(openxlsx)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Leer datos desde la primera hoja del archivo Excel</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read.xlsx</span>(ruta_archivo, <span class="at">sheet =</span> <span class="dv">1</span>)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>ruta_archivo <span class="ot">&lt;-</span> <span class="st">"01_Informacion_Data/Bureau_Labor_of_Statistics_Data/Detroit_Warren_Dearborn.xlsx"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-rows.print="5">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cargar la biblioteca openxlsx para trabajar con archivos Excel</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(openxlsx)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Leer datos desde la primera hoja del archivo Excel</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read.xlsx</span>(ruta_archivo, <span class="at">sheet =</span> <span class="dv">1</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Imprimir los datos cargados para verificar la lectura correcta del archivo</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(data, <span class="at">n=</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>   Local.Area.Unemployment.Statistics
-1                 Original Data Value
-2                          Series Id:
-3             Not Seasonally Adjusted
-4                               Area:
-5                          Area Type:
-6              State/Region/Division:
-7                              Years:
-8                                Year
-9                              1990.0
-10                             1991.0
-11                             1992.0
-12                             1993.0
-13                             1994.0
-14                             1995.0
-15                             1996.0
-16                             1997.0
-17                             1998.0
-18                             1999.0
-19                             2000.0
-20                             2001.0
-21                             2002.0
-22                             2003.0
-23                             2004.0
-24                             2005.0
-25                             2006.0
-26                             2007.0
-27                             2008.0
-28                             2009.0
-29                             2010.0
-30                             2011.0
-31                             2012.0
-32                             2013.0
-33                             2014.0
-34                             2015.0
-35                             2016.0
-36                             2017.0
-37                             2018.0
-38                             2019.0
-39                             2020.0
-40                             2021.0
-41                             2022.0
-42                             2023.0
-                                                          X2        X3
-1                                                       &lt;NA&gt;      &lt;NA&gt;
-2                                       LAUMT261982000000005      &lt;NA&gt;
-3                                                       &lt;NA&gt;      &lt;NA&gt;
-4  Detroit-Warren-Dearborn, MI Metropolitan Statistical Area      &lt;NA&gt;
-5                                         Metropolitan areas      &lt;NA&gt;
-6                                                   Michigan      &lt;NA&gt;
-7                                               1990 to 2023      &lt;NA&gt;
-8                                                        Jan       Feb
-9                                                  1926822.0 1925073.0
-10                                                 1885375.0 1883098.0
-11                                                 1894424.0 1899597.0
-12                                                 1938981.0 1952196.0
-13                                                 1991219.0 1995877.0
-14                                                 2025320.0 2033049.0
-15                                                 2065141.0 2088135.0
-16                                                 2084132.0 2094341.0
-17                                                 2130920.0 2144643.0
-18                                                 2176325.0 2181836.0
-19                                                 2226623.0 2226933.0
-20                                                 2160080.0 2160766.0
-21                                                 2063009.0 2074764.0
-22                                                 2048682.0 2053158.0
-23                                                 2031431.0 2035850.0
-24                                                 2006886.0 2008883.0
-25                                                 1995795.0 1996752.0
-26                                                 1984685.0 1986332.0
-27                                                 1940758.0 1933595.0
-28                                                 1809190.0 1800340.0
-29                                                 1744145.0 1744615.0
-30                                                 1738170.0 1734484.0
-31                                                 1780760.0 1784193.0
-32                                                 1805249.0 1810244.0
-33                                                 1839295.0 1838368.0
-34                                                 1860485.0 1857112.0
-35                                                 1926162.0 1935898.0
-36                                                 2003652.0 2007886.0
-37                                                 2032488.0 2045434.0
-38                                                 2075254.0 2078320.0
-39                                                 2071078.0 2069082.0
-40                                                 1927717.0 1932284.0
-41                                                 2009148.0 2011995.0
-42                                                 1999909.0 2010844.0
-          X4        X5        X6        X7        X8        X9       X10
-1       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;
-2       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;
-3       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;
-4       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;
-5       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;
-6       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;
-7       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;
-8        Mar       Apr       May       Jun       Jul       Aug       Sep
-9  1926567.0 1922407.0 1948814.0 1967810.0 1972778.0 1974490.0 1947257.0
-10 1885909.0 1881343.0 1888149.0 1917061.0 1930060.0 1932025.0 1922749.0
-11 1917545.0 1921384.0 1940907.0 1965584.0 1985441.0 2000932.0 1975719.0
-12 1963494.0 1960946.0 1990488.0 2013653.0 2026942.0 2036035.0 2014702.0
-13 1993106.0 1994510.0 2019638.0 2032742.0 2043578.0 2063955.0 2055023.0
-14 2033846.0 2033788.0 2054421.0 2071440.0 2092797.0 2101913.0 2083482.0
-15 2099940.0 2090128.0 2106499.0 2123845.0 2137680.0 2143002.0 2122668.0
-16 2110936.0 2105769.0 2131606.0 2143903.0 2164070.0 2172353.0 2156088.0
-17 2154810.0 2153303.0 2170368.0 2182567.0 2134406.0 2194728.0 2187417.0
-18 2198990.0 2196638.0 2225120.0 2238918.0 2245475.0 2254727.0 2234414.0
-19 2222084.0 2217992.0 2214696.0 2234117.0 2225844.0 2223588.0 2201183.0
-20 2160552.0 2137631.0 2141586.0 2150211.0 2155753.0 2138572.0 2127902.0
-21 2068583.0 2061024.0 2075423.0 2081037.0 2087126.0 2098307.0 2100600.0
-22 2049563.0 2039798.0 2047011.0 2059984.0 2053273.0 2058723.0 2049830.0
-23 2032307.0 2026905.0 2038121.0 2045780.0 2051935.0 2060671.0 2050448.0
-24 2011267.0 2017154.0 2037026.0 2045543.0 2052712.0 2068856.0 2053622.0
-25 2001914.0 1999272.0 2014512.0 2023247.0 2021376.0 2033087.0 2023420.0
-26 1990625.0 1966640.0 1983513.0 1991427.0 1996285.0 1986800.0 1982594.0
-27 1934386.0 1923672.0 1930096.0 1940264.0 1938667.0 1936492.0 1920491.0
-28 1792533.0 1789860.0 1785170.0 1779358.0 1786861.0 1789674.0 1774000.0
-29 1751580.0 1762322.0 1774874.0 1772373.0 1779222.0 1786554.0 1784697.0
-30 1748554.0 1744723.0 1765398.0 1765492.0 1772369.0 1792342.0 1799409.0
-31 1790831.0 1783452.0 1801377.0 1807355.0 1813877.0 1820822.0 1830984.0
-32 1819251.0 1821319.0 1845424.0 1846974.0 1857269.0 1865912.0 1869241.0
-33 1844993.0 1835719.0 1853273.0 1863781.0 1873108.0 1875038.0 1876627.0
-34 1864277.0 1868408.0 1891482.0 1897486.0 1909135.0 1917201.0 1917049.0
-35 1951200.0 1948490.0 1969718.0 1971956.0 1987972.0 1992365.0 1996742.0
-36 2028914.0 2032879.0 2040002.0 2048389.0 2060394.0 2063558.0 2067264.0
-37 2057629.0 2056093.0 2068007.0 2075048.0 2087611.0 2085694.0 2092818.0
-38 2084414.0 2075242.0 2078715.0 2094014.0 2116329.0 2115830.0 2116652.0
-39 2038770.0 1467523.0 1648091.0 1758320.0 1828123.0 1894777.0 1908975.0
-40 1954165.0 1949940.0 1956749.0 1965115.0 1990904.0 2005523.0 2012129.0
-41 2030561.0 2014751.0 2016847.0 2027662.0 2043249.0 2048596.0 2043709.0
-42 2057717.0 2051542.0 2053018.0 2071851.0 2100451.0 2121817.0 2137122.0
-         X11       X12       X13
-1       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;
-2       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;
-3       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;
-4       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;
-5       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;
-6       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;
-7       &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;
-8        Oct       Nov       Dec
-9  1948467.0 1932281.0 1933914.0
-10 1928640.0 1921212.0 1925173.0
-11 1979596.0 1980230.0 1986725.0
-12 2028009.0 2023364.0 2027839.0
-13 2070583.0 2069935.0 2071997.0
-14 2104962.0 2098492.0 2103321.0
-15 2140905.0 2135714.0 2133123.0
-16 2167086.0 2174147.0 2171746.0
-17 2203034.0 2205717.0 2210407.0
-18 2251072.0 2252143.0 2257041.0
-19 2210639.0 2202151.0 2206125.0
-20 2129706.0 2115108.0 2115258.0
-21 2108721.0 2090619.0 2085837.0
-22 2066602.0 2067005.0 2061246.0
-23 2067179.0 2057825.0 2051859.0
-24 2059368.0 2044787.0 2038836.0
-25 2040279.0 2029170.0 2026426.0
-26 1980943.0 1981843.0 1969298.0
-27 1913321.0 1884684.0 1859151.0
-28 1778149.0 1776140.0 1765580.0
-29 1779695.0 1770214.0 1764507.0
-30 1808544.0 1808493.0 1807408.0
-31 1839574.0 1829803.0 1829243.0
-32 1857665.0 1857144.0 1858096.0
-33 1888592.0 1880718.0 1882444.0
-34 1928965.0 1932765.0 1934667.0
-35 1998780.0 1998864.0 2000025.0
-36 2066240.0 2063240.0 2054815.0
-37 2102430.0 2098851.0 2099573.0
-38 2123617.0 2110692.0 2105270.0
-39 1956017.0 1951750.0 1906818.0
-40 2029259.0 2038790.0 2034615.0
-41 2046974.0 2036277.0 2042604.0
-42      &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;</code></pre>
+<pre><code>  Local.Area.Unemployment.Statistics
+1                Original Data Value
+2                         Series Id:
+3            Not Seasonally Adjusted
+4                              Area:
+5                         Area Type:
+                                                         X2   X3   X4   X5   X6
+1                                                      &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt;
+2                                      LAUMT261982000000005 &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt;
+3                                                      &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt;
+4 Detroit-Warren-Dearborn, MI Metropolitan Statistical Area &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt;
+5                                        Metropolitan areas &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt;
+    X7   X8   X9  X10  X11  X12  X13
+1 &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt;
+2 &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt;
+3 &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt;
+4 &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt;
+5 &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt; &lt;NA&gt;</code></pre>
 </div>
 </div>
 <div class="cell" data-rows.print="5">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>Employment <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">path =</span> ruta_archivo,</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">sheet =</span> <span class="st">"BLS Data Series"</span>,</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">skip =</span> <span class="dv">10</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(Employment)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>Employment <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">path =</span> ruta_archivo,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">sheet =</span> <span class="st">"BLS Data Series"</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">skip =</span> <span class="dv">10</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(Employment)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 34 × 13
     Year     Jan     Feb    Mar    Apr    May    Jun    Jul    Aug    Sep    Oct

@@ -33,10 +33,18 @@ La importación de datos es un proceso crucial en cualquier análisis de datos, 
 # Especificar la ruta del archivo Excel
 ruta_archivo <- "01_Informacion_Data/Bureau_Labor_of_Statistics_Data/Detroit_Warren_Dearborn.xlsx"
 
+```
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+
+# Cargar la biblioteca openxlsx para trabajar con archivos Excel
 library(openxlsx)
+
 # Leer datos desde la primera hoja del archivo Excel
 data <- read.xlsx(ruta_archivo, sheet = 1)
-print(data)
+
+# Imprimir los datos cargados para verificar la lectura correcta del archivo
+
+head(data, n=5)
 
 ```
 

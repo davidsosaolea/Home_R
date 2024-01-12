@@ -8,38 +8,99 @@ output:
     toc_float: true
     collapsed: true
     smooth_scroll: true
-    theme: journal
-    highlight: kate
+    theme: spacelab
+    highlight: tango
     df_print: paged
     code_folding: show
 ---
+
 # Introducción
 
 ## ¿Que es R?
 
 R es un lenguaje de programación y un entorno de software diseñado específicamente para estadísticas y análisis de datos. Desarrollado por estadísticos y científicos computacionales, R proporciona herramientas robustas para manipular, visualizar y modelar datos, convirtiéndolo en una opción popular entre profesionales en campos como la ciencia de datos, la investigación académica y la analítica empresarial. Su naturaleza de código abierto y la amplia gama de paquetes y extensiones disponibles permiten a los usuarios personalizar y ampliar sus capacidades según sus necesidades específicas. R se destaca por su flexibilidad y potencia en la exploración y comprensión de datos, convirtiéndolo en una herramienta valiosa en el mundo del análisis estadístico.
 
-# Importación y Configuración de Datos
+# Importación y Limpieza de Datos
 
 La importación de datos es un proceso crucial en cualquier análisis de datos, ya que la calidad y la precisión de los resultados dependen en gran medida de la calidad de los datos de entrada. La importancia de importar datos desde distintas fuentes radica en la diversidad y complejidad de la información que puede ser crucial para la toma de decisiones informadas
 
-## Importación de Datos (TSV , Excel, CSV, SQL)
+## Fuentes (TSV , Excel, CSV, SQL)
 
--   Excel: Para importar datos desde archivos Excel, el paquete readxl o openxlsx es comúnmente utilizado
+-   **Excel**: Para importar datos desde archivos Excel, el paquete readxl o openxlsx es comúnmente utilizado. Ejemplo:
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
+
+# Especificar la ruta del archivo Excel
+ruta_archivo <- "01_Informacion_Data/Bureau_Labor_of_Statistics_Data/Detroit_Warren_Dearborn.xlsx"
+
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+
+# Cargar la biblioteca openxlsx para trabajar con archivos Excel
+library(openxlsx)
+
+# Leer datos desde la primera hoja del archivo Excel
+Employment_1 <- read.xlsx(ruta_archivo, sheet = 1)
+
+# Imprimir los datos cargados para verificar la lectura correcta del archivo
+
+Employment_1
+
+```
+
+Es frecuente toparse con archivos Excel que presentan encabezados o filas vacías previas a los datos reales. Tanto las bibliotecas readxl como openxlsx brindan una solución sencilla para abordar esta situación.
+
+Aquí tienes un ejemplo utilizando la biblioteca readxl:
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# install.packages("readxl")
 library(readxl)
+
+# Leer el archivo Excel, omitiendo 10 filas al principio
 Employment <- read_excel(
-    path = "01_Informacion_Data/Bureau_Labor_of_Statistics_Data/Detroit_Warren_Dearborn.xlsx",
+    path = ruta_archivo,
     sheet = "BLS Data Series",
     skip = 10
 )
 Employment
 ```
 
+Este código ejemplifica cómo cargar un archivo Excel, específicamente desde la hoja "BLS Data Series", omitiendo las primeras 10 filas que contienen encabezados o información no deseada.
+
+-   **CSV**: La función read.csv() es usada para importar datos desde archivos CSV en R. Ejemplo:
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Especificar la ruta del archivo CSV
+file_ruta <- "01_Informacion_Data/Zillow/Zip_zhvi_uc_sfrcondo_tier_0.33_0.67_sm_sa_month.csv"
+
+# Leer el archivo Excel
+Zillow <- read.csv(file = file_ruta)
+
+head(Zillow)
+```
+
+
+-   **SQL**: Para importar datos desde bases de datos SQL en R, el paquete DBI y otros específicos de la base de datos (por ejemplo, RMySQL, RPostgreSQL) son empleados. Ejemplo:
+```{r}
+# Configurar detalles de conexión
+server <- "."
+database <- "LESAN"
+user <- "USER"
+password <- "PASSWORD"
+
+# Establecer la conexión
+con <- dbConnect(odbc::odbc(), 
+                 driver = "NombreDelControlador",  # Puede variar según tu sistema
+                 server = server,
+                 database = database,
+                 uid = user,
+                 pwd = password)
+```
+
+
 ## Extracción de Datos de Archivos zip
 
-## Preparación de Importación de Datos con Rapid API
+## Importación de Datos con Rapid API
 
 ## Organización Modular en R: Creación y Aplicación de Funciones Personalizadas
 

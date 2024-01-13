@@ -51,9 +51,11 @@ library(rvest)
 library(xml2)
 library(readxl)
 library(dplyr)
-
+getwd()
+setwd("R_class/Analysis_&_Manipulation_De_Datos_En_Espanol")
 # Para importar conjuntos de datos como "Employment", "Zillow", "Population" y "LandArea." 
 source("06_funciones_y_interacion_iteration/funciones_de_importacion.R")
+#source("06_funciones_y_interacion_iteration/funciones_de_importacion.R")
 
 # Uso de la función para cargar el conjunto de datos "Zillow"
 Zillow <- data_import(dataSource = "Zillow")

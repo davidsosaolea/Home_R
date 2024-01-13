@@ -24,7 +24,7 @@ R es un lenguaje de programación y un entorno de software diseñado específica
 
 La importación de datos es un proceso crucial en cualquier análisis de datos, ya que la calidad y la precisión de los resultados dependen en gran medida de la calidad de los datos de entrada. La importancia de importar datos desde distintas fuentes radica en la diversidad y complejidad de la información que puede ser crucial para la toma de decisiones informadas
 
-## Importación de Datos (TSV , Excel, CSV, SQL)
+## Importación de Datos (Excel, CSV)
 
 -   **Excel**: Para importar datos desde archivos Excel, el paquete readxl o openxlsx es comúnmente utilizado
 

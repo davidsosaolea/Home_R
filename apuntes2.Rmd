@@ -24,7 +24,7 @@ R es un lenguaje de programación y un entorno de software diseñado específica
 
 La importación de datos es un proceso crucial en cualquier análisis de datos, ya que la calidad y la precisión de los resultados dependen en gran medida de la calidad de los datos de entrada. La importancia de importar datos desde distintas fuentes radica en la diversidad y complejidad de la información que puede ser crucial para la toma de decisiones informadas
 
-## Fuentes (TSV , Excel, CSV, SQL)
+## Fuentes (Excel, CSV)
 
 -   **Excel**: Para importar datos desde archivos Excel, el paquete readxl o openxlsx es comúnmente utilizado. Ejemplo:
 
@@ -69,6 +69,7 @@ Employment
 Este código ejemplifica cómo cargar un archivo Excel, específicamente desde la hoja "BLS Data Series", omitiendo las primeras 10 filas que contienen encabezados o información no deseada.
 
 -   **CSV**: La función read.csv() es usada para importar datos desde archivos CSV en R. Ejemplo:
+
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Especificar la ruta del archivo CSV
 file_ruta <- "01_Informacion_Data/Zillow/Zip_zhvi_uc_sfrcondo_tier_0.33_0.67_sm_sa_month.csv"
@@ -79,29 +80,244 @@ Zillow <- read.csv(file = file_ruta)
 head(Zillow)
 ```
 
+## Extracción de Datos de Archivos zip
 
--   **SQL**: Para importar datos desde bases de datos SQL en R, el paquete DBI y otros específicos de la base de datos (por ejemplo, RMySQL, RPostgreSQL) son empleados. Ejemplo:
-```{r}
-# Configurar detalles de conexión
-server <- "."
-database <- "LESAN"
-user <- "USER"
-password <- "PASSWORD"
+En el ámbito del análisis de datos, la eficiencia y la consistencia en la manipulación de conjuntos de datos son fundamentales. En este contexto, el presente documento explora un script en R diseñado para automatizar la extracción, manipulación y limpieza de datos.
 
-# Establecer la conexión
-con <- dbConnect(odbc::odbc(), 
-                 driver = "NombreDelControlador",  # Puede variar según tu sistema
-                 server = server,
-                 database = database,
-                 uid = user,
-                 pwd = password)
+El script aborda la gestión de archivos ZIP que contienen información demográfica clave, extraída de diversas fuentes. A través de una serie de pasos, el código facilita la obtención, procesamiento y consolidación de datos en un formato más manejable y analítico.
+
+El análisis se inicia con la configuración del directorio de trabajo y la identificación de archivos ZIP relevantes. A continuación, se descomprimen estos archivos para revelar conjuntos de datos en formato CSV. Estos datos son entonces leídos, manipulados y agregados en un marco de datos unificado. Además, se realiza una limpieza de archivos temporales para mantener la integridad del espacio de trabajo.
+
+El objetivo de este script es proporcionar una herramienta eficaz para investigadores, analistas y profesionales de datos que deseen analizar y comprender las tendencias demográficas a lo largo del tiempo.
+
+A lo largo del documento, se detallarán cada una de las secciones del código, explicando las decisiones de diseño y brindando orientación sobre cómo adaptar el script a diferentes contextos y conjuntos de datos.
+
+Acompáñenos en este recorrido a través de un proceso automatizado que simplifica la gestión y análisis de datos demográficos del United States Census Bureau en el entorno de programación R.
+
+¡Comencemos!
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Cargar la biblioteca
+library(purrr)
+library(tidyverse)
+library(readr)
+
+
+# Configuración del directorio y archivos ZIP
+my_dir <- "01_Informacion_Data/US_Census_Bureau/"
+zip_files <- list.files(path = my_dir, pattern = "*.zip", full.names = TRUE)
+
+# Descomprimir archivos ZIP
+unzip_files <- map(zip_files, ~unzip(.x, exdir = my_dir))
+
 ```
 
+En esta sección, se configura el directorio de trabajo y se identifican los archivos ZIP en el directorio. Luego, se descomprimen los archivos ZIP en la misma ubicación.
 
-## Extracción de Datos de Archivos zip
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Obtener lista de archivos 
+data_Lfiles <- list.files(path = my_dir, full.names = TRUE)
+data_Lfiles
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Obtener archivos de datos en formato CSV
+data_files <- list.files(path = my_dir, pattern = "*Data.csv", full.names = TRUE)
+
+# Leer archivos CSV y almacenar en una lista
+pop_data <- map(.x = data_files, .f = read.csv, skip = 1, header = TRUE)
+
+# Agregar la columna 'Year' a cada conjunto de datos
+for (i in 1:length(pop_data)) {
+    pop_data[[i]]$Year <- 2010 + i
+}
+
+# Combinar la lista de conjuntos de datos en un marco de datos
+pop_data <- map_dfr(.x = pop_data, .f = pluck)
+
+# Seleccionar columnas relevantes
+pop_data <- pop_data %>% 
+    select(
+        Geographic.Area.Name, 
+        Estimate..SEX.AND.AGE..Total.population, 
+        Year
+    )
+```
+
+En esta sección, se identifican los archivos CSV que contienen "Data" en su nombre. Estos archivos se leen y manipulan para agregar una columna 'Year' a cada conjunto de datos. Luego, se combinan en un único marco de datos y se seleccionan las columnas relevantes.
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Obtener la lista de archivos .csv y .txt en el directorio
+files_to_remove <- list.files(path = my_dir, pattern = "\\.(csv|txt)$", full.names = TRUE)
+
+# Verificar si hay archivos para eliminar
+if (length(files_to_remove) > 0) {
+    # Eliminar los archivos
+    file.remove(files_to_remove)
+    cat("Archivos .csv y .txt eliminados correctamente en el directorio:", my_dir)
+} else {
+    cat("No hay archivos .csv y .txt para eliminar en el directorio:", my_dir)
+}
+
+pop_data 
+
+```
+
+Finalmente, se identifican los archivos temporales (CSV y TXT) y se eliminan. Se proporciona un mensaje indicando si se eliminaron archivos o si no se encontraron archivos para eliminar.
 
 ## Importación de Datos con Rapid API
 
+Este código en R se desarrolló con el propósito de importar datos mediante una interfaz de programación de aplicaciones (API) para obtener información relacionada con códigos postales en los Estados Unidos.
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Configurar la URL y claves de la API
+url <- "https://us-zip-code-to-income.p.rapidapi.com/"
+API_Key <- "b2f499316emsh3019cd6d5c60270p190dc5jsn9e46ae620e51" #uwu xd#
+API_Host <- "us-zip-code-to-income.p.rapidapi.com"
+request_delay <- 2 # Definir el retardo entre las solicitudes (en segundos)
+```
+
+En la sección inicial del código, se establecen las variables esenciales para la configuración de la API. Esto incluye la URL de la API, la clave de autenticación **(API_Key)**, el host de la API **(API_Host)**, y un retardo entre las solicitudes **(request_delay)** para cumplir con los límites de la API y evitar posibles restricciones.
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# missing_zip_codescrime_zip que se quiere extraer de la API
+missing_zip_codescrime_zip <- c("48430", "48211", "48760", "48139", "48440")
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Cargar la biblioteca
+library(httr)
+library(jsonlite)
+library(tidyverse)
+library(fs)
+library(rvest)
+library(xml2)
+library(readxl)
+library(dplyr)
+# Definir una función para importar datos utilizando la API
+data_import_IP <- function(url, API_Key, API_Host, request_delay) {
+    
+    data_df <- tibble()
+    
+    for (i in seq_along(missing_zip_codescrime_zip)) {
+        
+        query_params <- list(zip = missing_zip_codescrime_zip[i])
+        
+        # Realizar la solicitud GET a la API
+        response <- GET(url, add_headers("X-RapidAPI-Key" =  API_Key, "X-RapidAPI-Host" = API_Host), query = query_params)
+        
+        # Verificar el estado de la respuesta
+        stop_for_status(response)
+        
+        # Convertir la respuesta JSON a un marco de datos
+        cont_response <- fromJSON(rawToChar(response$content))
+        
+        # Concatenar el marco de datos resultante
+        data_df <- bind_rows(data_df, as_tibble(cont_response))
+        
+        # Imprimir información sobre el código postal procesado
+        print(str_glue("Zip Code: {missing_zip_codescrime_zip[i]}"))
+        
+        # Retardo entre las solicitudes para evitar límites de la API
+        Sys.sleep(request_delay)
+    }
+    
+    # Nombrar las columnas del marco de datos resultante
+    colnames(data_df) <- c("success", "zip", "House Hold Median Income", "household MeanIncome", "familyMedianIncome", "familyMeanIncome", "numHouseholds", "nonFamilyHousehold MedianIncome", "nonFamilyHouseholdMeanIncome", "familyPercentPoverty")
+    
+    return(data_df)
+}
+```
+
+La función **'data_import_IP'** tiene como objetivo principal realizar solicitudes a una API para obtener información relacionada con códigos postales en los Estados Unidos. Aquí está una explicación paso a paso de lo que hace la función:
+
+**1.Inicialización del Marco de Datos:**
+
+-   Se crea un marco de datos vacío llamado **'data_df'** utilizando la función **'tibble()'** que se utilizará para almacenar los resultados de las solicitudes a la API.
+
+**2.Bucle de Importación de Datos:**
+
+-   La función utiliza un bucle **'for'** para iterar sobre cada código postal en la secuencia **'missing_zip_codescrime_zip'**. Este bucle permite procesar cada código postal de manera individual.
+
+**3.Construcción de Parámetros de Consulta:**
+
+-   Para cada código postal, se construye un conjunto de parámetros de consulta denominado **'query_params'**. Este conjunto incluye el código postal actual y se utiliza en la solicitud a la API.
+
+**4.Solicitud GET a la API:**
+
+-   Se realiza una solicitud GET a la API utilizando la función **'GET'**. La URL de la API, las cabeceras de autenticación (**'X-RapidAPI-Key'** y **'X-RapidAPI-Host'**), y los parámetros de consulta se utilizan en la solicitud. La respuesta de la API se almacena en la variable **'response'**.
+
+**5.Procesamiento de la Respuesta JSON:**
+
+-   La respuesta en formato JSON se convierte a un formato tabular utilizando la función **'fromJSON'** del paquete **'jsonlite'**. El resultado se almacena en el objeto **'cont_response'**.
+
+**6.Concatenación de Resultados:**
+
+-   Los resultados de cada solicitud se concatenan al marco de datos existente (**'data_df'**) utilizando la función **'bind_rows'**.
+
+**7.Impresión de Información del Código Postal:**
+
+-   Se imprime información descriptiva sobre el código postal procesado, utilizando la función **'print(str_glue("Zip Code: {missing_zip_codescrime_zip[i]}"))'**. Esto facilita el seguimiento del progreso y la identificación de los códigos postales procesados.
+
+**8.Retardo entre Solicitudes:**
+
+Para cumplir con las políticas de velocidad de la API y evitar exceder límites, se introduce un retardo de tiempo (**'Sys.sleep(request_delay)'**) entre cada solicitud.
+
+**9.Nombrar Columnas del Marco de Datos Resultante:**
+
+-   Se asignan nombres descriptivos a las columnas del marco de datos resultante (**'data_df'**) para una interpretación más clara de los datos.
+
+**10.Retorno del Resultado:**
+
+-   La función retorna el marco de datos final (data_df), que contiene la información recopilada de todas las solicitudes a la API.
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Llamar a la función de importación de datos utilizando la API
+result_df <- data_import_IP(url, API_Key, API_Host, request_delay)
+
+result_df
+```
+
 ## Organización Modular en R: Creación y Aplicación de Funciones Personalizadas
 
+En R, puedes crear tus propias funciones y guardarlas en un script separado para luego poder utilizarlas en otros scripts. Aquí hay un ejemplo paso a paso:
+
+**1.Crea tu función en un script:** \* Abre un nuevo script en R (puedes usar un editor de texto o un entorno de desarrollo como RStudio). Define tu función y guárdala en el script. Por ejemplo, crea un archivo llamado **misFunciones.R** con el siguiente contenido:
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# misFunciones.R
+
+sumaDosNumeros <- function(a, b) {
+  resultado <- a + b
+  return(resultado)
+}
+
+```
+
+**2.Guarda el script:** \* Guarda el script con el nombre que hayas elegido, en este caso, **'misFunciones.R'**.
+
+**3.Usa la función en otro script:** \* En otro script o en la consola de R, puedes cargar el script que contiene tus funciones usando la función **'source'**. Aquí hay un ejemplo:
+
+```
+# scriptPrincipal.R
+
+# Cargar el script que contiene las funciones
+> source("misFunciones.R")
+
+# Ahora puedes utilizar la función en este script
+> resultado_suma <- sumaDosNumeros(3, 5)
+> print(resultado_suma)
+```
+
 ## Almacenando de data
+
+En estas líneas de código se utilizan para almacenar el objeto **'pop_data'** en un archivo RDS y luego cargarlo de nuevo en el entorno de trabajo de R en el objeto **'pop_data'**. Este proceso es útil para persistir datos entre sesiones de trabajo o compartir datos de manera eficiente, ya que el formato RDS conserva la estructura y los tipos de datos del objeto original.
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Guardar en archivo RDS
+rds_file <- file.path(my_dir, "pop_data.rds")
+saveRDS(pop_data, rds_file)
+
+# Cargar el archivo RDS en un objeto llamado pop_data
+pop_data <- readRDS(file.path(my_dir, "pop_data.rds"))
+```

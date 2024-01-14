@@ -3459,61 +3459,64 @@ función <strong>‘filter’</strong>:</p>
 <span id="cb41-6"><a href="#cb41-6" tabindex="-1"></a>  <span class="at">Age =</span> <span class="fu">c</span>(<span class="dv">25</span>, <span class="dv">30</span>, <span class="dv">22</span>, <span class="dv">35</span>, <span class="dv">28</span>, <span class="cn">NaN</span>),</span>
 <span id="cb41-7"><a href="#cb41-7" tabindex="-1"></a>  <span class="at">Gender =</span> <span class="fu">c</span>(<span class="st">&quot;Female&quot;</span>, <span class="st">&quot;Male&quot;</span>, <span class="st">&quot;Male&quot;</span>, <span class="st">&quot;Male&quot;</span>, <span class="st">&quot;Female&quot;</span>, <span class="st">&quot;Female&quot;</span>)</span>
 <span id="cb41-8"><a href="#cb41-8" tabindex="-1"></a>)</span>
-<span id="cb41-9"><a href="#cb41-9" tabindex="-1"></a><span class="fu">print</span>(df)</span></code></pre></div>
-<pre><code>##   ID     Name Age Gender
-## 1  1    Alice  25 Female
-## 2  2      Bob  30   Male
-## 3  3  Charlie  22   Male
-## 4  4    David  35   Male
-## 5  5      Eva  28 Female
-## 6  6 Fernanda NaN Female</code></pre>
+<span id="cb41-9"><a href="#cb41-9" tabindex="-1"></a></span>
+<span id="cb41-10"><a href="#cb41-10" tabindex="-1"></a>df</span></code></pre></div>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["ID"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Age"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Gender"],"name":[4],"type":["chr"],"align":["left"]}],"data":[{"1":"1","2":"Alice","3":"25","4":"Female"},{"1":"2","2":"Bob","3":"30","4":"Male"},{"1":"3","2":"Charlie","3":"22","4":"Male"},{"1":"4","2":"David","3":"35","4":"Male"},{"1":"5","2":"Eva","3":"28","4":"Female"},{"1":"6","2":"Fernanda","3":"NaN","4":"Female"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[5],"max":[5]},"pages":{}}}
+  </script>
+</div>
 <ul>
 <li>Filtrar basado en una condición numérica</li>
 </ul>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" tabindex="-1"></a><span class="co"># Filtrar personas mayores de 25 años</span></span>
-<span id="cb43-2"><a href="#cb43-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">filter</span>(df, Age <span class="sc">&gt;</span> <span class="dv">25</span>)</span>
-<span id="cb43-3"><a href="#cb43-3" tabindex="-1"></a><span class="fu">print</span>(result)</span></code></pre></div>
-<pre><code>##   ID  Name Age Gender
-## 1  2   Bob  30   Male
-## 2  4 David  35   Male
-## 3  5   Eva  28 Female</code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" tabindex="-1"></a><span class="co"># Filtrar personas mayores de 25 años</span></span>
+<span id="cb42-2"><a href="#cb42-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">filter</span>(df, Age <span class="sc">&gt;</span> <span class="dv">25</span>)</span>
+<span id="cb42-3"><a href="#cb42-3" tabindex="-1"></a></span>
+<span id="cb42-4"><a href="#cb42-4" tabindex="-1"></a>result</span></code></pre></div>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["ID"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Age"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Gender"],"name":[4],"type":["chr"],"align":["left"]}],"data":[{"1":"2","2":"Bob","3":"30","4":"Male"},{"1":"4","2":"David","3":"35","4":"Male"},{"1":"5","2":"Eva","3":"28","4":"Female"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
 <ul>
 <li>Filtrar basado en una condición de texto</li>
 </ul>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" tabindex="-1"></a><span class="co"># Filtrar personas de género femenino</span></span>
-<span id="cb45-2"><a href="#cb45-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">filter</span>(df, Gender <span class="sc">==</span> <span class="st">&quot;Female&quot;</span>)</span>
-<span id="cb45-3"><a href="#cb45-3" tabindex="-1"></a><span class="fu">print</span>(result)</span></code></pre></div>
-<pre><code>##   ID     Name Age Gender
-## 1  1    Alice  25 Female
-## 2  5      Eva  28 Female
-## 3  6 Fernanda NaN Female</code></pre>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" tabindex="-1"></a><span class="co"># Filtrar personas de género femenino</span></span>
+<span id="cb43-2"><a href="#cb43-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">filter</span>(df, Gender <span class="sc">==</span> <span class="st">&quot;Female&quot;</span>)</span>
+<span id="cb43-3"><a href="#cb43-3" tabindex="-1"></a></span>
+<span id="cb43-4"><a href="#cb43-4" tabindex="-1"></a>result</span></code></pre></div>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["ID"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Age"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Gender"],"name":[4],"type":["chr"],"align":["left"]}],"data":[{"1":"1","2":"Alice","3":"25","4":"Female"},{"1":"5","2":"Eva","3":"28","4":"Female"},{"1":"6","2":"Fernanda","3":"NaN","4":"Female"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[5],"max":[5]},"pages":{}}}
+  </script>
+</div>
 <ul>
 <li>Filtrar utilizando múltiples condiciones</li>
 </ul>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" tabindex="-1"></a><span class="co"># Filtrar personas mayores de 25 años y de género femenino</span></span>
-<span id="cb47-2"><a href="#cb47-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">filter</span>(df, Age <span class="sc">&gt;</span> <span class="dv">25</span> <span class="sc">&amp;</span> Gender <span class="sc">==</span> <span class="st">&quot;Female&quot;</span>)</span>
-<span id="cb47-3"><a href="#cb47-3" tabindex="-1"></a><span class="fu">print</span>(result)</span></code></pre></div>
-<pre><code>##   ID Name Age Gender
-## 1  5  Eva  28 Female</code></pre>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" tabindex="-1"></a><span class="co"># Filtrar personas mayores de 25 años y de género femenino</span></span>
+<span id="cb44-2"><a href="#cb44-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">filter</span>(df, Age <span class="sc">&gt;</span> <span class="dv">25</span> <span class="sc">&amp;</span> Gender <span class="sc">==</span> <span class="st">&quot;Female&quot;</span>)</span>
+<span id="cb44-3"><a href="#cb44-3" tabindex="-1"></a></span>
+<span id="cb44-4"><a href="#cb44-4" tabindex="-1"></a>result</span></code></pre></div>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["ID"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Name"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Age"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["Gender"],"name":[4],"type":["chr"],"align":["left"]}],"data":[{"1":"5","2":"Eva","3":"28","4":"Female"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[5],"max":[5]},"pages":{}}}
+  </script>
+</div>
 <ul>
 <li>Filtrar valores faltantes</li>
 </ul>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" tabindex="-1"></a><span class="fu">library</span>(naniar)</span>
-<span id="cb49-2"><a href="#cb49-2" tabindex="-1"></a><span class="co"># Resumen de valores faltantes en el conjunto de datos filtrado</span></span>
-<span id="cb49-3"><a href="#cb49-3" tabindex="-1"></a>miss_val_resumen <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
-<span id="cb49-4"><a href="#cb49-4" tabindex="-1"></a>  <span class="fu">miss_case_summary</span>()</span>
-<span id="cb49-5"><a href="#cb49-5" tabindex="-1"></a></span>
-<span id="cb49-6"><a href="#cb49-6" tabindex="-1"></a><span class="co"># Imprimir el resumen</span></span>
-<span id="cb49-7"><a href="#cb49-7" tabindex="-1"></a><span class="fu">print</span>(miss_val_resumen)</span></code></pre></div>
-<pre><code>## # A tibble: 6 × 3
-##    case n_miss pct_miss
-##   &lt;int&gt;  &lt;int&gt;    &lt;dbl&gt;
-## 1     6      1       25
-## 2     1      0        0
-## 3     2      0        0
-## 4     3      0        0
-## 5     4      0        0
-## 6     5      0        0</code></pre>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" tabindex="-1"></a><span class="fu">library</span>(naniar)</span>
+<span id="cb45-2"><a href="#cb45-2" tabindex="-1"></a><span class="co"># Resumen de valores faltantes en el conjunto de datos filtrado</span></span>
+<span id="cb45-3"><a href="#cb45-3" tabindex="-1"></a>miss_val_resumen <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
+<span id="cb45-4"><a href="#cb45-4" tabindex="-1"></a>  <span class="fu">miss_case_summary</span>()</span>
+<span id="cb45-5"><a href="#cb45-5" tabindex="-1"></a></span>
+<span id="cb45-6"><a href="#cb45-6" tabindex="-1"></a><span class="co"># Imprimir el resumen</span></span>
+<span id="cb45-7"><a href="#cb45-7" tabindex="-1"></a>miss_val_resumen</span></code></pre></div>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["case"],"name":[1],"type":["int"],"align":["right"]},{"label":["n_miss"],"name":[2],"type":["int"],"align":["right"]},{"label":["pct_miss"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"6","2":"1","3":"25"},{"1":"1","2":"0","3":"0"},{"1":"2","2":"0","3":"0"},{"1":"3","2":"0","3":"0"},{"1":"4","2":"0","3":"0"},{"1":"5","2":"0","3":"0"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[6],"max":[6]},"pages":{}}}
+  </script>
+</div>
 </div>
 <div id="uso-de-mutate" class="section level2">
 <h2>Uso de mutate</h2>
@@ -3522,127 +3525,96 @@ función <strong>‘filter’</strong>:</p>
 en columnas existentes o agregar nuevas columnas a un conjunto de datos.
 Esta función es comúnmente utilizada en el contexto de manipulación y
 transformación de datos.</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" tabindex="-1"></a><span class="co"># Instala e carga las librerías necesarias si no las has instalado</span></span>
-<span id="cb51-2"><a href="#cb51-2" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb51-3"><a href="#cb51-3" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
-<span id="cb51-4"><a href="#cb51-4" tabindex="-1"></a></span>
-<span id="cb51-5"><a href="#cb51-5" tabindex="-1"></a><span class="co"># Crear un conjunto de datos ficticio con una columna de fechas</span></span>
-<span id="cb51-6"><a href="#cb51-6" tabindex="-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb51-7"><a href="#cb51-7" tabindex="-1"></a>  <span class="at">Date_chr =</span> <span class="fu">c</span>(<span class="st">&quot;2022-01-15&quot;</span>, <span class="st">&quot;2021-08-22&quot;</span>, <span class="st">&quot;2023-03-10&quot;</span>)</span>
-<span id="cb51-8"><a href="#cb51-8" tabindex="-1"></a>)</span>
-<span id="cb51-9"><a href="#cb51-9" tabindex="-1"></a></span>
-<span id="cb51-10"><a href="#cb51-10" tabindex="-1"></a><span class="co"># Utilizar mutate() y year() para crear una nueva columna &quot;Year&quot;</span></span>
-<span id="cb51-11"><a href="#cb51-11" tabindex="-1"></a>datos_con_year <span class="ot">&lt;-</span> datos <span class="sc">%&gt;%</span></span>
-<span id="cb51-12"><a href="#cb51-12" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="fu">year</span>(<span class="fu">ymd</span>(Date_chr)))</span>
-<span id="cb51-13"><a href="#cb51-13" tabindex="-1"></a></span>
-<span id="cb51-14"><a href="#cb51-14" tabindex="-1"></a><span class="co"># Imprimir el conjunto de datos resultante</span></span>
-<span id="cb51-15"><a href="#cb51-15" tabindex="-1"></a><span class="fu">print</span>(datos_con_year)</span></code></pre></div>
-<pre><code>##     Date_chr Year
-## 1 2022-01-15 2022
-## 2 2021-08-22 2021
-## 3 2023-03-10 2023</code></pre>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" tabindex="-1"></a><span class="co"># Instala e carga las librerías necesarias si no las has instalado</span></span>
+<span id="cb46-2"><a href="#cb46-2" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb46-3"><a href="#cb46-3" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb46-4"><a href="#cb46-4" tabindex="-1"></a></span>
+<span id="cb46-5"><a href="#cb46-5" tabindex="-1"></a><span class="co"># Crear un conjunto de datos ficticio con una columna de fechas</span></span>
+<span id="cb46-6"><a href="#cb46-6" tabindex="-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb46-7"><a href="#cb46-7" tabindex="-1"></a>  <span class="at">Date_chr =</span> <span class="fu">c</span>(<span class="st">&quot;2022-01-15&quot;</span>, <span class="st">&quot;2021-08-22&quot;</span>, <span class="st">&quot;2023-03-10&quot;</span>)</span>
+<span id="cb46-8"><a href="#cb46-8" tabindex="-1"></a>)</span>
+<span id="cb46-9"><a href="#cb46-9" tabindex="-1"></a></span>
+<span id="cb46-10"><a href="#cb46-10" tabindex="-1"></a><span class="co"># Utilizar mutate() y year() para crear una nueva columna &quot;Year&quot;</span></span>
+<span id="cb46-11"><a href="#cb46-11" tabindex="-1"></a>datos_con_year <span class="ot">&lt;-</span> datos <span class="sc">%&gt;%</span></span>
+<span id="cb46-12"><a href="#cb46-12" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="fu">year</span>(<span class="fu">ymd</span>(Date_chr)))</span>
+<span id="cb46-13"><a href="#cb46-13" tabindex="-1"></a></span>
+<span id="cb46-14"><a href="#cb46-14" tabindex="-1"></a><span class="co"># Imprimir el conjunto de datos resultante</span></span>
+<span id="cb46-15"><a href="#cb46-15" tabindex="-1"></a>datos_con_year</span></code></pre></div>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Date_chr"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Year"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"2022-01-15","2":"2022"},{"1":"2021-08-22","2":"2021"},{"1":"2023-03-10","2":"2023"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[5],"max":[5]},"pages":{}}}
+  </script>
+</div>
 </div>
 <div id="técnicas-de-fusión-y-transformaciones" class="section level2">
 <h2>Técnicas de Fusión y Transformaciones</h2>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" tabindex="-1"></a><span class="co"># Crear ejemplo de df1</span></span>
-<span id="cb53-2"><a href="#cb53-2" tabindex="-1"></a>df1 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb53-3"><a href="#cb53-3" tabindex="-1"></a>  <span class="at">ID =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>),</span>
-<span id="cb53-4"><a href="#cb53-4" tabindex="-1"></a>  <span class="at">Nombre =</span> <span class="fu">c</span>(<span class="st">&quot;Alice&quot;</span>, <span class="st">&quot;Bob&quot;</span>, <span class="st">&quot;Charlie&quot;</span>, <span class="st">&quot;David&quot;</span>,<span class="st">&quot;Bob&quot;</span>, <span class="st">&quot;Charlie&quot;</span>, <span class="st">&quot;David&quot;</span>),</span>
-<span id="cb53-5"><a href="#cb53-5" tabindex="-1"></a>  <span class="at">Apellido =</span> <span class="fu">c</span>(<span class="st">&quot;Smith&quot;</span>, <span class="st">&quot;Johnson&quot;</span>, <span class="st">&quot;Garcia&quot;</span>, <span class="st">&quot;Fisher&quot;</span>,<span class="st">&quot;Johnson&quot;</span>, <span class="st">&quot;Garcia&quot;</span>, <span class="st">&quot;Fisher&quot;</span>)</span>
-<span id="cb53-6"><a href="#cb53-6" tabindex="-1"></a>)</span>
-<span id="cb53-7"><a href="#cb53-7" tabindex="-1"></a></span>
-<span id="cb53-8"><a href="#cb53-8" tabindex="-1"></a><span class="co"># Crear ejemplo de df2</span></span>
-<span id="cb53-9"><a href="#cb53-9" tabindex="-1"></a>df2 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb53-10"><a href="#cb53-10" tabindex="-1"></a>  <span class="at">ID =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">2</span>),</span>
-<span id="cb53-11"><a href="#cb53-11" tabindex="-1"></a>  <span class="at">Ventas =</span> <span class="fu">c</span>(<span class="dv">2250</span>, <span class="dv">5047</span>, <span class="dv">5461</span>, <span class="dv">7539</span>, <span class="dv">2250</span>, <span class="dv">5047</span>, <span class="dv">5461</span>)</span>
-<span id="cb53-12"><a href="#cb53-12" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" tabindex="-1"></a><span class="co"># Crear ejemplo de df1</span></span>
+<span id="cb47-2"><a href="#cb47-2" tabindex="-1"></a>df1 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb47-3"><a href="#cb47-3" tabindex="-1"></a>  <span class="at">ID =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>),</span>
+<span id="cb47-4"><a href="#cb47-4" tabindex="-1"></a>  <span class="at">Nombre =</span> <span class="fu">c</span>(<span class="st">&quot;Alice&quot;</span>, <span class="st">&quot;Bob&quot;</span>, <span class="st">&quot;Charlie&quot;</span>, <span class="st">&quot;David&quot;</span>,<span class="st">&quot;Bob&quot;</span>, <span class="st">&quot;Charlie&quot;</span>, <span class="st">&quot;David&quot;</span>),</span>
+<span id="cb47-5"><a href="#cb47-5" tabindex="-1"></a>  <span class="at">Apellido =</span> <span class="fu">c</span>(<span class="st">&quot;Smith&quot;</span>, <span class="st">&quot;Johnson&quot;</span>, <span class="st">&quot;Garcia&quot;</span>, <span class="st">&quot;Fisher&quot;</span>,<span class="st">&quot;Johnson&quot;</span>, <span class="st">&quot;Garcia&quot;</span>, <span class="st">&quot;Fisher&quot;</span>)</span>
+<span id="cb47-6"><a href="#cb47-6" tabindex="-1"></a>)</span>
+<span id="cb47-7"><a href="#cb47-7" tabindex="-1"></a></span>
+<span id="cb47-8"><a href="#cb47-8" tabindex="-1"></a><span class="co"># Crear ejemplo de df2</span></span>
+<span id="cb47-9"><a href="#cb47-9" tabindex="-1"></a>df2 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb47-10"><a href="#cb47-10" tabindex="-1"></a>  <span class="at">ID =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">2</span>),</span>
+<span id="cb47-11"><a href="#cb47-11" tabindex="-1"></a>  <span class="at">Ventas =</span> <span class="fu">c</span>(<span class="dv">2250</span>, <span class="dv">5047</span>, <span class="dv">5461</span>, <span class="dv">7539</span>, <span class="dv">2250</span>, <span class="dv">5047</span>, <span class="dv">5461</span>)</span>
+<span id="cb47-12"><a href="#cb47-12" tabindex="-1"></a>)</span></code></pre></div>
 <ul>
 <li>Fusión de DF</li>
 </ul>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" tabindex="-1"></a><span class="co"># Ejemplo de fusión </span></span>
-<span id="cb54-2"><a href="#cb54-2" tabindex="-1"></a></span>
-<span id="cb54-3"><a href="#cb54-3" tabindex="-1"></a>merged_df <span class="ot">&lt;-</span> df1 <span class="sc">|&gt;</span></span>
-<span id="cb54-4"><a href="#cb54-4" tabindex="-1"></a>  <span class="fu">full_join</span>(df2, <span class="at">by =</span> <span class="st">&quot;ID&quot;</span>)</span>
-<span id="cb54-5"><a href="#cb54-5" tabindex="-1"></a></span>
-<span id="cb54-6"><a href="#cb54-6" tabindex="-1"></a><span class="fu">print</span>(merged_df)</span></code></pre></div>
-<pre><code>##    ID  Nombre Apellido Ventas
-## 1   1   Alice    Smith     NA
-## 2   2     Bob  Johnson   2250
-## 3   2     Bob  Johnson   5461
-## 4   3 Charlie   Garcia   5047
-## 5   3 Charlie   Garcia   2250
-## 6   4   David   Fisher   5461
-## 7   4   David   Fisher   5047
-## 8   2     Bob  Johnson   2250
-## 9   2     Bob  Johnson   5461
-## 10  3 Charlie   Garcia   5047
-## 11  3 Charlie   Garcia   2250
-## 12  4   David   Fisher   5461
-## 13  4   David   Fisher   5047
-## 14  5    &lt;NA&gt;     &lt;NA&gt;   7539</code></pre>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" tabindex="-1"></a><span class="co"># Ejemplo de fusión </span></span>
+<span id="cb48-2"><a href="#cb48-2" tabindex="-1"></a></span>
+<span id="cb48-3"><a href="#cb48-3" tabindex="-1"></a>merged_df <span class="ot">&lt;-</span> df1 <span class="sc">|&gt;</span></span>
+<span id="cb48-4"><a href="#cb48-4" tabindex="-1"></a>  <span class="fu">full_join</span>(df2, <span class="at">by =</span> <span class="st">&quot;ID&quot;</span>)</span>
+<span id="cb48-5"><a href="#cb48-5" tabindex="-1"></a></span>
+<span id="cb48-6"><a href="#cb48-6" tabindex="-1"></a>merged_df</span></code></pre></div>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["ID"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Nombre"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Apellido"],"name":[3],"type":["chr"],"align":["left"]},{"label":["Ventas"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"Alice","3":"Smith","4":"NA"},{"1":"2","2":"Bob","3":"Johnson","4":"2250"},{"1":"2","2":"Bob","3":"Johnson","4":"5461"},{"1":"3","2":"Charlie","3":"Garcia","4":"5047"},{"1":"3","2":"Charlie","3":"Garcia","4":"2250"},{"1":"4","2":"David","3":"Fisher","4":"5461"},{"1":"4","2":"David","3":"Fisher","4":"5047"},{"1":"2","2":"Bob","3":"Johnson","4":"2250"},{"1":"2","2":"Bob","3":"Johnson","4":"5461"},{"1":"3","2":"Charlie","3":"Garcia","4":"5047"},{"1":"3","2":"Charlie","3":"Garcia","4":"2250"},{"1":"4","2":"David","3":"Fisher","4":"5461"},{"1":"4","2":"David","3":"Fisher","4":"5047"},{"1":"5","2":"NA","3":"NA","4":"7539"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[5],"max":[5]},"pages":{}}}
+  </script>
+</div>
 <ul>
 <li>Agrupacion</li>
 </ul>
-<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" tabindex="-1"></a><span class="co"># Ejemplo de agrupación y resumen </span></span>
-<span id="cb56-2"><a href="#cb56-2" tabindex="-1"></a></span>
-<span id="cb56-3"><a href="#cb56-3" tabindex="-1"></a>ventas_resumen <span class="ot">&lt;-</span> merged_df <span class="sc">%&gt;%</span></span>
-<span id="cb56-4"><a href="#cb56-4" tabindex="-1"></a>  <span class="fu">group_by</span>(Nombre) <span class="sc">%&gt;%</span></span>
-<span id="cb56-5"><a href="#cb56-5" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Total_Ventas =</span> <span class="fu">sum</span>(Ventas))</span>
-<span id="cb56-6"><a href="#cb56-6" tabindex="-1"></a></span>
-<span id="cb56-7"><a href="#cb56-7" tabindex="-1"></a><span class="fu">print</span>(ventas_resumen)</span></code></pre></div>
-<pre><code>## # A tibble: 5 × 2
-##   Nombre  Total_Ventas
-##   &lt;chr&gt;          &lt;dbl&gt;
-## 1 Alice             NA
-## 2 Bob            15422
-## 3 Charlie        14594
-## 4 David          21016
-## 5 &lt;NA&gt;            7539</code></pre>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" tabindex="-1"></a><span class="co"># Ejemplo de agrupación y resumen </span></span>
+<span id="cb49-2"><a href="#cb49-2" tabindex="-1"></a></span>
+<span id="cb49-3"><a href="#cb49-3" tabindex="-1"></a>ventas_resumen <span class="ot">&lt;-</span> merged_df <span class="sc">%&gt;%</span></span>
+<span id="cb49-4"><a href="#cb49-4" tabindex="-1"></a>  <span class="fu">group_by</span>(Nombre) <span class="sc">%&gt;%</span></span>
+<span id="cb49-5"><a href="#cb49-5" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Total_Ventas =</span> <span class="fu">sum</span>(Ventas))</span>
+<span id="cb49-6"><a href="#cb49-6" tabindex="-1"></a></span>
+<span id="cb49-7"><a href="#cb49-7" tabindex="-1"></a>ventas_resumen</span></code></pre></div>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Nombre"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Total_Ventas"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"Alice","2":"NA"},{"1":"Bob","2":"15422"},{"1":"Charlie","2":"14594"},{"1":"David","2":"21016"},{"1":"NA","2":"7539"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[5],"max":[5]},"pages":{}}}
+  </script>
+</div>
 <ul>
 <li>Combinación de columnas</li>
 </ul>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" tabindex="-1"></a><span class="co"># Ejemplo de combinación de columnas</span></span>
-<span id="cb58-2"><a href="#cb58-2" tabindex="-1"></a>merged_df <span class="ot">&lt;-</span> merged_df <span class="sc">%&gt;%</span></span>
-<span id="cb58-3"><a href="#cb58-3" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Nueva_Columna =</span> <span class="fu">paste</span>(Nombre, Apellido, <span class="at">sep =</span> <span class="st">&quot;-&quot;</span>))</span>
-<span id="cb58-4"><a href="#cb58-4" tabindex="-1"></a><span class="fu">print</span>(merged_df)</span></code></pre></div>
-<pre><code>##    ID  Nombre Apellido Ventas  Nueva_Columna
-## 1   1   Alice    Smith     NA    Alice-Smith
-## 2   2     Bob  Johnson   2250    Bob-Johnson
-## 3   2     Bob  Johnson   5461    Bob-Johnson
-## 4   3 Charlie   Garcia   5047 Charlie-Garcia
-## 5   3 Charlie   Garcia   2250 Charlie-Garcia
-## 6   4   David   Fisher   5461   David-Fisher
-## 7   4   David   Fisher   5047   David-Fisher
-## 8   2     Bob  Johnson   2250    Bob-Johnson
-## 9   2     Bob  Johnson   5461    Bob-Johnson
-## 10  3 Charlie   Garcia   5047 Charlie-Garcia
-## 11  3 Charlie   Garcia   2250 Charlie-Garcia
-## 12  4   David   Fisher   5461   David-Fisher
-## 13  4   David   Fisher   5047   David-Fisher
-## 14  5    &lt;NA&gt;     &lt;NA&gt;   7539          NA-NA</code></pre>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" tabindex="-1"></a><span class="co"># Ejemplo de combinación de columnas</span></span>
+<span id="cb50-2"><a href="#cb50-2" tabindex="-1"></a>merged_df <span class="ot">&lt;-</span> merged_df <span class="sc">%&gt;%</span></span>
+<span id="cb50-3"><a href="#cb50-3" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Nueva_Columna =</span> <span class="fu">paste</span>(Nombre, Apellido, <span class="at">sep =</span> <span class="st">&quot;-&quot;</span>))</span>
+<span id="cb50-4"><a href="#cb50-4" tabindex="-1"></a></span>
+<span id="cb50-5"><a href="#cb50-5" tabindex="-1"></a>merged_df</span></code></pre></div>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["ID"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["Nombre"],"name":[2],"type":["chr"],"align":["left"]},{"label":["Apellido"],"name":[3],"type":["chr"],"align":["left"]},{"label":["Ventas"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["Nueva_Columna"],"name":[5],"type":["chr"],"align":["left"]}],"data":[{"1":"1","2":"Alice","3":"Smith","4":"NA","5":"Alice-Smith"},{"1":"2","2":"Bob","3":"Johnson","4":"2250","5":"Bob-Johnson"},{"1":"2","2":"Bob","3":"Johnson","4":"5461","5":"Bob-Johnson"},{"1":"3","2":"Charlie","3":"Garcia","4":"5047","5":"Charlie-Garcia"},{"1":"3","2":"Charlie","3":"Garcia","4":"2250","5":"Charlie-Garcia"},{"1":"4","2":"David","3":"Fisher","4":"5461","5":"David-Fisher"},{"1":"4","2":"David","3":"Fisher","4":"5047","5":"David-Fisher"},{"1":"2","2":"Bob","3":"Johnson","4":"2250","5":"Bob-Johnson"},{"1":"2","2":"Bob","3":"Johnson","4":"5461","5":"Bob-Johnson"},{"1":"3","2":"Charlie","3":"Garcia","4":"5047","5":"Charlie-Garcia"},{"1":"3","2":"Charlie","3":"Garcia","4":"2250","5":"Charlie-Garcia"},{"1":"4","2":"David","3":"Fisher","4":"5461","5":"David-Fisher"},{"1":"4","2":"David","3":"Fisher","4":"5047","5":"David-Fisher"},{"1":"5","2":"NA","3":"NA","4":"7539","5":"NA-NA"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[5],"max":[5]},"pages":{}}}
+  </script>
+</div>
 </div>
 <div id="selección-de-información-relevante" class="section level2">
 <h2>Selección de Información Relevante</h2>
-<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" tabindex="-1"></a><span class="co"># Seleccionar solo las columnas &quot;Nombre&quot; y &quot;Ventas&quot;</span></span>
-<span id="cb60-2"><a href="#cb60-2" tabindex="-1"></a>datos_seleccionados <span class="ot">&lt;-</span> <span class="fu">select</span>(merged_df, Nombre, Ventas)</span>
-<span id="cb60-3"><a href="#cb60-3" tabindex="-1"></a></span>
-<span id="cb60-4"><a href="#cb60-4" tabindex="-1"></a><span class="co"># Imprimir el dataframe resultante</span></span>
-<span id="cb60-5"><a href="#cb60-5" tabindex="-1"></a><span class="fu">print</span>(datos_seleccionados)</span></code></pre></div>
-<pre><code>##     Nombre Ventas
-## 1    Alice     NA
-## 2      Bob   2250
-## 3      Bob   5461
-## 4  Charlie   5047
-## 5  Charlie   2250
-## 6    David   5461
-## 7    David   5047
-## 8      Bob   2250
-## 9      Bob   5461
-## 10 Charlie   5047
-## 11 Charlie   2250
-## 12   David   5461
-## 13   David   5047
-## 14    &lt;NA&gt;   7539</code></pre>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" tabindex="-1"></a><span class="co"># Seleccionar solo las columnas &quot;Nombre&quot; y &quot;Ventas&quot;</span></span>
+<span id="cb51-2"><a href="#cb51-2" tabindex="-1"></a>datos_seleccionados <span class="ot">&lt;-</span> <span class="fu">select</span>(merged_df, Nombre, Ventas)</span>
+<span id="cb51-3"><a href="#cb51-3" tabindex="-1"></a></span>
+<span id="cb51-4"><a href="#cb51-4" tabindex="-1"></a><span class="co"># Imprimir el dataframe resultante</span></span>
+<span id="cb51-5"><a href="#cb51-5" tabindex="-1"></a>datos_seleccionados</span></code></pre></div>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Nombre"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Ventas"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"Alice","2":"NA"},{"1":"Bob","2":"2250"},{"1":"Bob","2":"5461"},{"1":"Charlie","2":"5047"},{"1":"Charlie","2":"2250"},{"1":"David","2":"5461"},{"1":"David","2":"5047"},{"1":"Bob","2":"2250"},{"1":"Bob","2":"5461"},{"1":"Charlie","2":"5047"},{"1":"Charlie","2":"2250"},{"1":"David","2":"5461"},{"1":"David","2":"5047"},{"1":"NA","2":"7539"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[5],"max":[5]},"pages":{}}}
+  </script>
+</div>
 </div>
 </div>
 <div id="visualizaciones-de-datos" class="section level1">

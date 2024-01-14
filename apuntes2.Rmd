@@ -321,3 +321,27 @@ saveRDS(pop_data, rds_file)
 # Cargar el archivo RDS en un objeto llamado pop_data
 pop_data <- readRDS(file.path(my_dir, "pop_data.rds"))
 ```
+
+# Manipulación y Preparación de Datos
+
+## Preparación de Manipulación de Datos
+## Manipulación de Datos
+## Cambio Porcentual/Retorno Sobre la Inversión
+## RAR/Rendimiento Anual Promedio
+## TCAC/Tasa de Crecimiento Anual Compuesta
+## Métricas ROI, TMR, TCAC con VDT/Valor del Tiempo del Dinero
+## Técnicas de Fusión y Transformaciones
+## Gestión de Datos Ausentes y Selección de Información Relevante
+## Estructura de Datos Laborales
+
+# Visualizaciones de Datos
+
+## Configuración de Estructura de Datos para ggplot y Plotly
+## Visualizaciones Dinámicas y Multi-Panel con ggplot2 y Plotly
+## Visualizaciones de Tendencias Anuales de Precios de Viviendas con Tooltips
+## Visualización de Indicadores Económicos: Valores de Viviendas y Expansión del Mercado Laboral
+## Análisis de la Evolución Porcentual de los Precios de Viviendas Contra el Empleo a Través de Regresión LOESS
+## Explorando Mercados Inmobiliarios: Usando Geom_Bar
+## Representación Gráfica del Ingreso Medio Familiar con Element Text
+## Descifrando el Crecimiento Urbano: Gráfico de Pareto Interactivo de CAGRs por Código Postal
+## Gráfico de Pareto Clásico

@@ -3366,6 +3366,320 @@ estructura y los tipos de datos del objeto original.</p>
 <span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a>pop_data <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">file.path</span>(my_dir, <span class="st">&quot;pop_data.rds&quot;</span>))</span></code></pre></div>
 </div>
 </div>
+<div id="manipulación-y-preparación-de-datos" class="section level1">
+<h1>Manipulación y Preparación de Datos</h1>
+<div id="comparación-de-data-frames" class="section level2">
+<h2>Comparación de Data Frames</h2>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="co"># Definir valores de prueba para DWD_MI_Zip y crime_zip</span></span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>DWD_MI_Zip <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;10001&quot;</span>, <span class="st">&quot;20002&quot;</span>, <span class="st">&quot;30303&quot;</span>, <span class="st">&quot;40004&quot;</span>, <span class="st">&quot;50005&quot;</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>crime_zip <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;10001&quot;</span>, <span class="st">&quot;30303&quot;</span>, <span class="st">&quot;50005&quot;</span>, <span class="st">&quot;60006&quot;</span>, <span class="st">&quot;70007&quot;</span>)</span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a><span class="co"># Comprobar si los conjuntos de códigos postales son idénticos</span></span>
+<span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a>identical_result <span class="ot">&lt;-</span> <span class="fu">identical</span>(DWD_MI_Zip, crime_zip)</span>
+<span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;Los conjuntos son idénticos:&quot;</span>, identical_result))</span></code></pre></div>
+<pre><code>## [1] &quot;Los conjuntos son idénticos: FALSE&quot;</code></pre>
+<p>La función <strong>identical()</strong> se utiliza para verificar si
+dos objetos son idénticos entre sí. La función devuelve un valor lógico
+(TRUE o FALSE) según si los objetos son idénticos o no.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="co"># Mostrar los códigos postales que faltan en cada conjunto</span></span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>missing_DWD_MI_Zip <span class="ot">&lt;-</span> DWD_MI_Zip[<span class="sc">!</span>DWD_MI_Zip <span class="sc">%in%</span> crime_zip]</span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>missing_crime_zip <span class="ot">&lt;-</span> crime_zip[<span class="sc">!</span>crime_zip <span class="sc">%in%</span> DWD_MI_Zip]</span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a><span class="fu">print</span>(<span class="st">&quot;Códigos postales que faltan en DWD_MI_Zip:&quot;</span>)</span></code></pre></div>
+<pre><code>## [1] &quot;Códigos postales que faltan en DWD_MI_Zip:&quot;</code></pre>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="fu">print</span>(missing_DWD_MI_Zip)</span></code></pre></div>
+<pre><code>## [1] &quot;20002&quot; &quot;40004&quot;</code></pre>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="fu">print</span>(<span class="st">&quot;Códigos postales que faltan en crime_zip:&quot;</span>)</span></code></pre></div>
+<pre><code>## [1] &quot;Códigos postales que faltan en crime_zip:&quot;</code></pre>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="fu">print</span>(missing_crime_zip)</span></code></pre></div>
+<pre><code>## [1] &quot;60006&quot; &quot;70007&quot;</code></pre>
+<p>Este código en R tiene como objetivo identificar y mostrar los
+códigos postales que faltan en dos conjuntos de datos,
+<strong>DWD_MI_Zip</strong> y <strong>crime_zip</strong>. Utiliza la
+función <strong>%in%</strong> para realizar la comparación entre los dos
+conjuntos y determinar los elementos que no están presentes en
+ambos.</p>
+</div>
+<div id="transformar-y-formatear-datos" class="section level2">
+<h2>Transformar y formatear datos</h2>
+<p>La librería scales en R proporciona funciones para transformar y
+formatear datos, especialmente útiles para la visualización de gráficos.
+Aquí hay un resumen de las principales funciones y utilidades
+proporcionadas por scales:</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a><span class="co"># Cargar la biblioteca</span></span>
+<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
+<span id="cb31-3"><a href="#cb31-3" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="#cb31-4" tabindex="-1"></a><span class="co"># Numero de prueba</span></span>
+<span id="cb31-5"><a href="#cb31-5" tabindex="-1"></a>number <span class="ot">&lt;-</span> <span class="fl">5.1234567</span></span>
+<span id="cb31-6"><a href="#cb31-6" tabindex="-1"></a></span>
+<span id="cb31-7"><a href="#cb31-7" tabindex="-1"></a><span class="co"># Formato de dolares</span></span>
+<span id="cb31-8"><a href="#cb31-8" tabindex="-1"></a>number <span class="sc">|&gt;</span> </span>
+<span id="cb31-9"><a href="#cb31-9" tabindex="-1"></a>    scales<span class="sc">::</span><span class="fu">dollar</span>()</span></code></pre></div>
+<pre><code>## [1] &quot;$5.12&quot;</code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a><span class="co"># Formateo de Números como Porcentajes</span></span>
+<span id="cb33-2"><a href="#cb33-2" tabindex="-1"></a>number <span class="sc">|&gt;</span> </span>
+<span id="cb33-3"><a href="#cb33-3" tabindex="-1"></a>    scales<span class="sc">::</span><span class="fu">percent</span>(<span class="at">accuracy =</span> <span class="fl">0.01</span>)</span></code></pre></div>
+<pre><code>## [1] &quot;512.35%&quot;</code></pre>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a><span class="co"># Crear un vector de fechas</span></span>
+<span id="cb35-2"><a href="#cb35-2" tabindex="-1"></a>dates <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="fu">c</span>(<span class="st">&quot;2022-01-15 12:30:00&quot;</span>, <span class="st">&quot;2022-02-20 15:45:00&quot;</span>, <span class="st">&quot;2022-03-25 18:15:00&quot;</span>))</span>
+<span id="cb35-3"><a href="#cb35-3" tabindex="-1"></a></span>
+<span id="cb35-4"><a href="#cb35-4" tabindex="-1"></a><span class="co"># Formatear las fechas en el estilo &quot;día de la semana, mes día, año&quot;</span></span>
+<span id="cb35-5"><a href="#cb35-5" tabindex="-1"></a>formatted_dates <span class="ot">&lt;-</span> <span class="fu">date_format</span>(<span class="st">&quot;%A, %B %d, %Y&quot;</span>)(dates)</span>
+<span id="cb35-6"><a href="#cb35-6" tabindex="-1"></a><span class="fu">print</span>(formatted_dates)</span></code></pre></div>
+<pre><code>## [1] &quot;sábado, Enero 15, 2022&quot;    &quot;domingo, Febrero 20, 2022&quot;
+## [3] &quot;viernes, Marzo 25, 2022&quot;</code></pre>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a><span class="co"># Crear un vector de horas</span></span>
+<span id="cb37-2"><a href="#cb37-2" tabindex="-1"></a>times <span class="ot">&lt;-</span> <span class="fu">as.POSIXct</span>(<span class="fu">c</span>(<span class="st">&quot;2022-01-15 12:30:00&quot;</span>, <span class="st">&quot;2022-02-20 15:45:00&quot;</span>, <span class="st">&quot;2022-03-25 18:15:00&quot;</span>))</span>
+<span id="cb37-3"><a href="#cb37-3" tabindex="-1"></a></span>
+<span id="cb37-4"><a href="#cb37-4" tabindex="-1"></a><span class="co"># Formatear las horas en el estilo &quot;hora:minuto AM/PM&quot;</span></span>
+<span id="cb37-5"><a href="#cb37-5" tabindex="-1"></a>formatted_times <span class="ot">&lt;-</span> <span class="fu">time_format</span>(<span class="st">&quot;%I:%M %p&quot;</span>)(times)</span>
+<span id="cb37-6"><a href="#cb37-6" tabindex="-1"></a><span class="fu">print</span>(formatted_times)</span></code></pre></div>
+<pre><code>## [1] &quot;05:30 p. m.&quot; &quot;08:45 p. m.&quot; &quot;11:15 p. m.&quot;</code></pre>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" tabindex="-1"></a><span class="co"># Crear un vector de fechas y horas</span></span>
+<span id="cb39-2"><a href="#cb39-2" tabindex="-1"></a>datetime <span class="ot">&lt;-</span> <span class="fu">as.POSIXct</span>(<span class="fu">c</span>(<span class="st">&quot;2022-01-15 12:30:00&quot;</span>, <span class="st">&quot;2022-02-20 15:45:00&quot;</span>, <span class="st">&quot;2022-03-25 18:15:00&quot;</span>))</span>
+<span id="cb39-3"><a href="#cb39-3" tabindex="-1"></a></span>
+<span id="cb39-4"><a href="#cb39-4" tabindex="-1"></a><span class="co"># Formatear las fechas y horas en el estilo &quot;día de la semana, mes día, año hora:minuto AM/PM&quot;</span></span>
+<span id="cb39-5"><a href="#cb39-5" tabindex="-1"></a>formatted_datetime <span class="ot">&lt;-</span> <span class="fu">date_format</span>(<span class="st">&quot;%A, %B %d, %Y %I:%M %p&quot;</span>)(datetime)</span>
+<span id="cb39-6"><a href="#cb39-6" tabindex="-1"></a><span class="fu">print</span>(formatted_datetime)</span></code></pre></div>
+<pre><code>## [1] &quot;sábado, Enero 15, 2022 05:30 p. m.&quot;   
+## [2] &quot;domingo, Febrero 20, 2022 08:45 p. m.&quot;
+## [3] &quot;viernes, Marzo 25, 2022 11:15 p. m.&quot;</code></pre>
+</div>
+<div id="filtrar-datos" class="section level2">
+<h2>Filtrar datos</h2>
+<p>En R, la función <strong>‘filter’</strong> se utiliza comúnmente para
+extraer filas específicas de un conjunto de datos basándose en
+condiciones específicas. Aquí tienes algunos ejemplos de cómo usar la
+función <strong>‘filter’</strong>:</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb41-2"><a href="#cb41-2" tabindex="-1"></a><span class="co"># Crear un ejemplo de dataframe</span></span>
+<span id="cb41-3"><a href="#cb41-3" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb41-4"><a href="#cb41-4" tabindex="-1"></a>  <span class="at">ID =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>),</span>
+<span id="cb41-5"><a href="#cb41-5" tabindex="-1"></a>  <span class="at">Name =</span> <span class="fu">c</span>(<span class="st">&quot;Alice&quot;</span>, <span class="st">&quot;Bob&quot;</span>, <span class="st">&quot;Charlie&quot;</span>, <span class="st">&quot;David&quot;</span>, <span class="st">&quot;Eva&quot;</span>, <span class="st">&quot;Fernanda&quot;</span>),</span>
+<span id="cb41-6"><a href="#cb41-6" tabindex="-1"></a>  <span class="at">Age =</span> <span class="fu">c</span>(<span class="dv">25</span>, <span class="dv">30</span>, <span class="dv">22</span>, <span class="dv">35</span>, <span class="dv">28</span>, <span class="cn">NaN</span>),</span>
+<span id="cb41-7"><a href="#cb41-7" tabindex="-1"></a>  <span class="at">Gender =</span> <span class="fu">c</span>(<span class="st">&quot;Female&quot;</span>, <span class="st">&quot;Male&quot;</span>, <span class="st">&quot;Male&quot;</span>, <span class="st">&quot;Male&quot;</span>, <span class="st">&quot;Female&quot;</span>, <span class="st">&quot;Female&quot;</span>)</span>
+<span id="cb41-8"><a href="#cb41-8" tabindex="-1"></a>)</span>
+<span id="cb41-9"><a href="#cb41-9" tabindex="-1"></a><span class="fu">print</span>(df)</span></code></pre></div>
+<pre><code>##   ID     Name Age Gender
+## 1  1    Alice  25 Female
+## 2  2      Bob  30   Male
+## 3  3  Charlie  22   Male
+## 4  4    David  35   Male
+## 5  5      Eva  28 Female
+## 6  6 Fernanda NaN Female</code></pre>
+<ul>
+<li>Filtrar basado en una condición numérica</li>
+</ul>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" tabindex="-1"></a><span class="co"># Filtrar personas mayores de 25 años</span></span>
+<span id="cb43-2"><a href="#cb43-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">filter</span>(df, Age <span class="sc">&gt;</span> <span class="dv">25</span>)</span>
+<span id="cb43-3"><a href="#cb43-3" tabindex="-1"></a><span class="fu">print</span>(result)</span></code></pre></div>
+<pre><code>##   ID  Name Age Gender
+## 1  2   Bob  30   Male
+## 2  4 David  35   Male
+## 3  5   Eva  28 Female</code></pre>
+<ul>
+<li>Filtrar basado en una condición de texto</li>
+</ul>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" tabindex="-1"></a><span class="co"># Filtrar personas de género femenino</span></span>
+<span id="cb45-2"><a href="#cb45-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">filter</span>(df, Gender <span class="sc">==</span> <span class="st">&quot;Female&quot;</span>)</span>
+<span id="cb45-3"><a href="#cb45-3" tabindex="-1"></a><span class="fu">print</span>(result)</span></code></pre></div>
+<pre><code>##   ID     Name Age Gender
+## 1  1    Alice  25 Female
+## 2  5      Eva  28 Female
+## 3  6 Fernanda NaN Female</code></pre>
+<ul>
+<li>Filtrar utilizando múltiples condiciones</li>
+</ul>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" tabindex="-1"></a><span class="co"># Filtrar personas mayores de 25 años y de género femenino</span></span>
+<span id="cb47-2"><a href="#cb47-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">filter</span>(df, Age <span class="sc">&gt;</span> <span class="dv">25</span> <span class="sc">&amp;</span> Gender <span class="sc">==</span> <span class="st">&quot;Female&quot;</span>)</span>
+<span id="cb47-3"><a href="#cb47-3" tabindex="-1"></a><span class="fu">print</span>(result)</span></code></pre></div>
+<pre><code>##   ID Name Age Gender
+## 1  5  Eva  28 Female</code></pre>
+<ul>
+<li>Filtrar valores faltantes</li>
+</ul>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" tabindex="-1"></a><span class="fu">library</span>(naniar)</span>
+<span id="cb49-2"><a href="#cb49-2" tabindex="-1"></a><span class="co"># Resumen de valores faltantes en el conjunto de datos filtrado</span></span>
+<span id="cb49-3"><a href="#cb49-3" tabindex="-1"></a>miss_val_resumen <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
+<span id="cb49-4"><a href="#cb49-4" tabindex="-1"></a>  <span class="fu">miss_case_summary</span>()</span>
+<span id="cb49-5"><a href="#cb49-5" tabindex="-1"></a></span>
+<span id="cb49-6"><a href="#cb49-6" tabindex="-1"></a><span class="co"># Imprimir el resumen</span></span>
+<span id="cb49-7"><a href="#cb49-7" tabindex="-1"></a><span class="fu">print</span>(miss_val_resumen)</span></code></pre></div>
+<pre><code>## # A tibble: 6 × 3
+##    case n_miss pct_miss
+##   &lt;int&gt;  &lt;int&gt;    &lt;dbl&gt;
+## 1     6      1       25
+## 2     1      0        0
+## 3     2      0        0
+## 4     3      0        0
+## 5     4      0        0
+## 6     5      0        0</code></pre>
+</div>
+<div id="uso-de-mutate" class="section level2">
+<h2>Uso de mutate</h2>
+<p>La función <strong>mutate()</strong> es parte del paquete
+<strong>dplyr</strong> en R y se utiliza para realizar transformaciones
+en columnas existentes o agregar nuevas columnas a un conjunto de datos.
+Esta función es comúnmente utilizada en el contexto de manipulación y
+transformación de datos.</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" tabindex="-1"></a><span class="co"># Instala e carga las librerías necesarias si no las has instalado</span></span>
+<span id="cb51-2"><a href="#cb51-2" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb51-3"><a href="#cb51-3" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb51-4"><a href="#cb51-4" tabindex="-1"></a></span>
+<span id="cb51-5"><a href="#cb51-5" tabindex="-1"></a><span class="co"># Crear un conjunto de datos ficticio con una columna de fechas</span></span>
+<span id="cb51-6"><a href="#cb51-6" tabindex="-1"></a>datos <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb51-7"><a href="#cb51-7" tabindex="-1"></a>  <span class="at">Date_chr =</span> <span class="fu">c</span>(<span class="st">&quot;2022-01-15&quot;</span>, <span class="st">&quot;2021-08-22&quot;</span>, <span class="st">&quot;2023-03-10&quot;</span>)</span>
+<span id="cb51-8"><a href="#cb51-8" tabindex="-1"></a>)</span>
+<span id="cb51-9"><a href="#cb51-9" tabindex="-1"></a></span>
+<span id="cb51-10"><a href="#cb51-10" tabindex="-1"></a><span class="co"># Utilizar mutate() y year() para crear una nueva columna &quot;Year&quot;</span></span>
+<span id="cb51-11"><a href="#cb51-11" tabindex="-1"></a>datos_con_year <span class="ot">&lt;-</span> datos <span class="sc">%&gt;%</span></span>
+<span id="cb51-12"><a href="#cb51-12" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="fu">year</span>(<span class="fu">ymd</span>(Date_chr)))</span>
+<span id="cb51-13"><a href="#cb51-13" tabindex="-1"></a></span>
+<span id="cb51-14"><a href="#cb51-14" tabindex="-1"></a><span class="co"># Imprimir el conjunto de datos resultante</span></span>
+<span id="cb51-15"><a href="#cb51-15" tabindex="-1"></a><span class="fu">print</span>(datos_con_year)</span></code></pre></div>
+<pre><code>##     Date_chr Year
+## 1 2022-01-15 2022
+## 2 2021-08-22 2021
+## 3 2023-03-10 2023</code></pre>
+</div>
+<div id="técnicas-de-fusión-y-transformaciones" class="section level2">
+<h2>Técnicas de Fusión y Transformaciones</h2>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" tabindex="-1"></a><span class="co"># Crear ejemplo de df1</span></span>
+<span id="cb53-2"><a href="#cb53-2" tabindex="-1"></a>df1 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb53-3"><a href="#cb53-3" tabindex="-1"></a>  <span class="at">ID =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>),</span>
+<span id="cb53-4"><a href="#cb53-4" tabindex="-1"></a>  <span class="at">Nombre =</span> <span class="fu">c</span>(<span class="st">&quot;Alice&quot;</span>, <span class="st">&quot;Bob&quot;</span>, <span class="st">&quot;Charlie&quot;</span>, <span class="st">&quot;David&quot;</span>,<span class="st">&quot;Bob&quot;</span>, <span class="st">&quot;Charlie&quot;</span>, <span class="st">&quot;David&quot;</span>),</span>
+<span id="cb53-5"><a href="#cb53-5" tabindex="-1"></a>  <span class="at">Apellido =</span> <span class="fu">c</span>(<span class="st">&quot;Smith&quot;</span>, <span class="st">&quot;Johnson&quot;</span>, <span class="st">&quot;Garcia&quot;</span>, <span class="st">&quot;Fisher&quot;</span>,<span class="st">&quot;Johnson&quot;</span>, <span class="st">&quot;Garcia&quot;</span>, <span class="st">&quot;Fisher&quot;</span>)</span>
+<span id="cb53-6"><a href="#cb53-6" tabindex="-1"></a>)</span>
+<span id="cb53-7"><a href="#cb53-7" tabindex="-1"></a></span>
+<span id="cb53-8"><a href="#cb53-8" tabindex="-1"></a><span class="co"># Crear ejemplo de df2</span></span>
+<span id="cb53-9"><a href="#cb53-9" tabindex="-1"></a>df2 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb53-10"><a href="#cb53-10" tabindex="-1"></a>  <span class="at">ID =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">2</span>),</span>
+<span id="cb53-11"><a href="#cb53-11" tabindex="-1"></a>  <span class="at">Ventas =</span> <span class="fu">c</span>(<span class="dv">2250</span>, <span class="dv">5047</span>, <span class="dv">5461</span>, <span class="dv">7539</span>, <span class="dv">2250</span>, <span class="dv">5047</span>, <span class="dv">5461</span>)</span>
+<span id="cb53-12"><a href="#cb53-12" tabindex="-1"></a>)</span></code></pre></div>
+<ul>
+<li>Fusión de DF</li>
+</ul>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" tabindex="-1"></a><span class="co"># Ejemplo de fusión </span></span>
+<span id="cb54-2"><a href="#cb54-2" tabindex="-1"></a></span>
+<span id="cb54-3"><a href="#cb54-3" tabindex="-1"></a>merged_df <span class="ot">&lt;-</span> df1 <span class="sc">|&gt;</span></span>
+<span id="cb54-4"><a href="#cb54-4" tabindex="-1"></a>  <span class="fu">full_join</span>(df2, <span class="at">by =</span> <span class="st">&quot;ID&quot;</span>)</span>
+<span id="cb54-5"><a href="#cb54-5" tabindex="-1"></a></span>
+<span id="cb54-6"><a href="#cb54-6" tabindex="-1"></a><span class="fu">print</span>(merged_df)</span></code></pre></div>
+<pre><code>##    ID  Nombre Apellido Ventas
+## 1   1   Alice    Smith     NA
+## 2   2     Bob  Johnson   2250
+## 3   2     Bob  Johnson   5461
+## 4   3 Charlie   Garcia   5047
+## 5   3 Charlie   Garcia   2250
+## 6   4   David   Fisher   5461
+## 7   4   David   Fisher   5047
+## 8   2     Bob  Johnson   2250
+## 9   2     Bob  Johnson   5461
+## 10  3 Charlie   Garcia   5047
+## 11  3 Charlie   Garcia   2250
+## 12  4   David   Fisher   5461
+## 13  4   David   Fisher   5047
+## 14  5    &lt;NA&gt;     &lt;NA&gt;   7539</code></pre>
+<ul>
+<li>Agrupacion</li>
+</ul>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" tabindex="-1"></a><span class="co"># Ejemplo de agrupación y resumen </span></span>
+<span id="cb56-2"><a href="#cb56-2" tabindex="-1"></a></span>
+<span id="cb56-3"><a href="#cb56-3" tabindex="-1"></a>ventas_resumen <span class="ot">&lt;-</span> merged_df <span class="sc">%&gt;%</span></span>
+<span id="cb56-4"><a href="#cb56-4" tabindex="-1"></a>  <span class="fu">group_by</span>(Nombre) <span class="sc">%&gt;%</span></span>
+<span id="cb56-5"><a href="#cb56-5" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">Total_Ventas =</span> <span class="fu">sum</span>(Ventas))</span>
+<span id="cb56-6"><a href="#cb56-6" tabindex="-1"></a></span>
+<span id="cb56-7"><a href="#cb56-7" tabindex="-1"></a><span class="fu">print</span>(ventas_resumen)</span></code></pre></div>
+<pre><code>## # A tibble: 5 × 2
+##   Nombre  Total_Ventas
+##   &lt;chr&gt;          &lt;dbl&gt;
+## 1 Alice             NA
+## 2 Bob            15422
+## 3 Charlie        14594
+## 4 David          21016
+## 5 &lt;NA&gt;            7539</code></pre>
+<ul>
+<li>Combinación de columnas</li>
+</ul>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" tabindex="-1"></a><span class="co"># Ejemplo de combinación de columnas</span></span>
+<span id="cb58-2"><a href="#cb58-2" tabindex="-1"></a>merged_df <span class="ot">&lt;-</span> merged_df <span class="sc">%&gt;%</span></span>
+<span id="cb58-3"><a href="#cb58-3" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Nueva_Columna =</span> <span class="fu">paste</span>(Nombre, Apellido, <span class="at">sep =</span> <span class="st">&quot;-&quot;</span>))</span>
+<span id="cb58-4"><a href="#cb58-4" tabindex="-1"></a><span class="fu">print</span>(merged_df)</span></code></pre></div>
+<pre><code>##    ID  Nombre Apellido Ventas  Nueva_Columna
+## 1   1   Alice    Smith     NA    Alice-Smith
+## 2   2     Bob  Johnson   2250    Bob-Johnson
+## 3   2     Bob  Johnson   5461    Bob-Johnson
+## 4   3 Charlie   Garcia   5047 Charlie-Garcia
+## 5   3 Charlie   Garcia   2250 Charlie-Garcia
+## 6   4   David   Fisher   5461   David-Fisher
+## 7   4   David   Fisher   5047   David-Fisher
+## 8   2     Bob  Johnson   2250    Bob-Johnson
+## 9   2     Bob  Johnson   5461    Bob-Johnson
+## 10  3 Charlie   Garcia   5047 Charlie-Garcia
+## 11  3 Charlie   Garcia   2250 Charlie-Garcia
+## 12  4   David   Fisher   5461   David-Fisher
+## 13  4   David   Fisher   5047   David-Fisher
+## 14  5    &lt;NA&gt;     &lt;NA&gt;   7539          NA-NA</code></pre>
+</div>
+<div id="selección-de-información-relevante" class="section level2">
+<h2>Selección de Información Relevante</h2>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" tabindex="-1"></a><span class="co"># Seleccionar solo las columnas &quot;Nombre&quot; y &quot;Ventas&quot;</span></span>
+<span id="cb60-2"><a href="#cb60-2" tabindex="-1"></a>datos_seleccionados <span class="ot">&lt;-</span> <span class="fu">select</span>(merged_df, Nombre, Ventas)</span>
+<span id="cb60-3"><a href="#cb60-3" tabindex="-1"></a></span>
+<span id="cb60-4"><a href="#cb60-4" tabindex="-1"></a><span class="co"># Imprimir el dataframe resultante</span></span>
+<span id="cb60-5"><a href="#cb60-5" tabindex="-1"></a><span class="fu">print</span>(datos_seleccionados)</span></code></pre></div>
+<pre><code>##     Nombre Ventas
+## 1    Alice     NA
+## 2      Bob   2250
+## 3      Bob   5461
+## 4  Charlie   5047
+## 5  Charlie   2250
+## 6    David   5461
+## 7    David   5047
+## 8      Bob   2250
+## 9      Bob   5461
+## 10 Charlie   5047
+## 11 Charlie   2250
+## 12   David   5461
+## 13   David   5047
+## 14    &lt;NA&gt;   7539</code></pre>
+</div>
+</div>
+<div id="visualizaciones-de-datos" class="section level1">
+<h1>Visualizaciones de Datos</h1>
+<div id="configuración-de-estructura-de-datos-para-ggplot-y-plotly" class="section level2">
+<h2>Configuración de Estructura de Datos para ggplot y Plotly</h2>
+</div>
+<div id="visualizaciones-dinámicas-y-multi-panel-con-ggplot2-y-plotly" class="section level2">
+<h2>Visualizaciones Dinámicas y Multi-Panel con ggplot2 y Plotly</h2>
+</div>
+<div id="visualizaciones-de-tendencias-anuales-de-precios-de-viviendas-con-tooltips" class="section level2">
+<h2>Visualizaciones de Tendencias Anuales de Precios de Viviendas con
+Tooltips</h2>
+</div>
+<div id="visualización-de-indicadores-económicos-valores-de-viviendas-y-expansión-del-mercado-laboral" class="section level2">
+<h2>Visualización de Indicadores Económicos: Valores de Viviendas y
+Expansión del Mercado Laboral</h2>
+</div>
+<div id="análisis-de-la-evolución-porcentual-de-los-precios-de-viviendas-contra-el-empleo-a-través-de-regresión-loess" class="section level2">
+<h2>Análisis de la Evolución Porcentual de los Precios de Viviendas
+Contra el Empleo a Través de Regresión LOESS</h2>
+</div>
+<div id="explorando-mercados-inmobiliarios-usando-geom_bar" class="section level2">
+<h2>Explorando Mercados Inmobiliarios: Usando Geom_Bar</h2>
+</div>
+<div id="representación-gráfica-del-ingreso-medio-familiar-con-element-text" class="section level2">
+<h2>Representación Gráfica del Ingreso Medio Familiar con Element
+Text</h2>
+</div>
+<div id="descifrando-el-crecimiento-urbano-gráfico-de-pareto-interactivo-de-cagrs-por-código-postal" class="section level2">
+<h2>Descifrando el Crecimiento Urbano: Gráfico de Pareto Interactivo de
+CAGRs por Código Postal</h2>
+</div>
+<div id="gráfico-de-pareto-clásico" class="section level2">
+<h2>Gráfico de Pareto Clásico</h2>
+</div>
+</div>
 
 
 

@@ -420,7 +420,8 @@ df <- data.frame(
   Age = c(25, 30, 22, 35, 28, NaN),
   Gender = c("Female", "Male", "Male", "Male", "Female", "Female")
 )
-print(df)
+
+df
 ```
 
 * Filtrar basado en una condición numérica
@@ -428,7 +429,8 @@ print(df)
 ```{r}
 # Filtrar personas mayores de 25 años
 result <- filter(df, Age > 25)
-print(result)
+
+result
 ```
 
 * Filtrar basado en una condición de texto
@@ -436,14 +438,16 @@ print(result)
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Filtrar personas de género femenino
 result <- filter(df, Gender == "Female")
-print(result)
+
+result
 ```
 * Filtrar utilizando múltiples condiciones
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Filtrar personas mayores de 25 años y de género femenino
 result <- filter(df, Age > 25 & Gender == "Female")
-print(result)
+
+result
 
 ```
 
@@ -456,7 +460,7 @@ miss_val_resumen <- df |>
   miss_case_summary()
 
 # Imprimir el resumen
-print(miss_val_resumen)
+miss_val_resumen
 ```
 
 ## Uso de mutate
@@ -478,7 +482,7 @@ datos_con_year <- datos %>%
   mutate(Year = year(ymd(Date_chr)))
 
 # Imprimir el conjunto de datos resultante
-print(datos_con_year)
+datos_con_year
 ```
 
 
@@ -510,7 +514,7 @@ df2 <- data.frame(
 merged_df <- df1 |>
   full_join(df2, by = "ID")
 
-print(merged_df)
+merged_df
 ```
 * Agrupacion 
 
@@ -521,7 +525,7 @@ ventas_resumen <- merged_df %>%
   group_by(Nombre) %>%
   summarise(Total_Ventas = sum(Ventas))
 
-print(ventas_resumen)
+ventas_resumen
 ```
 * Combinación de columnas
 
@@ -529,12 +533,18 @@ print(ventas_resumen)
 # Ejemplo de combinación de columnas
 merged_df <- merged_df %>%
   mutate(Nueva_Columna = paste(Nombre, Apellido, sep = "-"))
-print(merged_df)
+
+merged_df
 ```
 
-## Gestión de Datos Ausentes y Selección de Información Relevante
+## Selección de Información Relevante
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Seleccionar solo las columnas "Nombre" y "Ventas"
+datos_seleccionados <- select(merged_df, Nombre, Ventas)
 
-## Estructura de Datos Laborales
+# Imprimir el dataframe resultante
+datos_seleccionados
+```
 
 
 

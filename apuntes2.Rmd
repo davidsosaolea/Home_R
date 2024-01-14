@@ -387,7 +387,7 @@ print(formatted_dates)
 ```
 
 
-```{r}
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Crear un vector de horas
 times <- as.POSIXct(c("2022-01-15 12:30:00", "2022-02-20 15:45:00", "2022-03-25 18:15:00"))
 
@@ -397,7 +397,7 @@ print(formatted_times)
 ```
 
 
-```{r}
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Crear un vector de fechas y horas
 datetime <- as.POSIXct(c("2022-01-15 12:30:00", "2022-02-20 15:45:00", "2022-03-25 18:15:00"))
 
@@ -409,15 +409,128 @@ print(formatted_datetime)
 
 ## Filtrar datos
 
+En R, la función **'filter'** se utiliza comúnmente para extraer filas específicas de un conjunto de datos basándose en condiciones específicas. Aquí tienes algunos ejemplos de cómo usar la función **'filter'**:
 
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+library(dplyr)
+# Crear un ejemplo de dataframe
+df <- data.frame(
+  ID = c(1, 2, 3, 4, 5, 6),
+  Name = c("Alice", "Bob", "Charlie", "David", "Eva", "Fernanda"),
+  Age = c(25, 30, 22, 35, 28, NaN),
+  Gender = c("Female", "Male", "Male", "Male", "Female", "Female")
+)
+print(df)
+```
 
-## RAR/Rendimiento Anual Promedio
+* Filtrar basado en una condición numérica
 
-## TCAC/Tasa de Crecimiento Anual Compuesta
+```{r}
+# Filtrar personas mayores de 25 años
+result <- filter(df, Age > 25)
+print(result)
+```
 
-## Métricas ROI, TMR, TCAC con VDT/Valor del Tiempo del Dinero
+* Filtrar basado en una condición de texto
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Filtrar personas de género femenino
+result <- filter(df, Gender == "Female")
+print(result)
+```
+* Filtrar utilizando múltiples condiciones
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Filtrar personas mayores de 25 años y de género femenino
+result <- filter(df, Age > 25 & Gender == "Female")
+print(result)
+
+```
+
+* Filtrar valores faltantes 
+
+```{r, message=FALSE , warning=FALSE, rows.print = 6}
+library(naniar)
+# Resumen de valores faltantes en el conjunto de datos filtrado
+miss_val_resumen <- df |>
+  miss_case_summary()
+
+# Imprimir el resumen
+print(miss_val_resumen)
+```
+
+## Uso de mutate
+
+La función **mutate()** es parte del paquete **dplyr** en R y se utiliza para realizar transformaciones en columnas existentes o agregar nuevas columnas a un conjunto de datos. Esta función es comúnmente utilizada en el contexto de manipulación y transformación de datos.
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Instala e carga las librerías necesarias si no las has instalado
+library(dplyr)
+library(lubridate)
+
+# Crear un conjunto de datos ficticio con una columna de fechas
+datos <- data.frame(
+  Date_chr = c("2022-01-15", "2021-08-22", "2023-03-10")
+)
+
+# Utilizar mutate() y year() para crear una nueva columna "Year"
+datos_con_year <- datos %>%
+  mutate(Year = year(ymd(Date_chr)))
+
+# Imprimir el conjunto de datos resultante
+print(datos_con_year)
+```
+
 
 ## Técnicas de Fusión y Transformaciones
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Crear ejemplo de df1
+df1 <- data.frame(
+  ID = c(1, 2, 3, 4, 2, 3, 4),
+  Nombre = c("Alice", "Bob", "Charlie", "David","Bob", "Charlie", "David"),
+  Apellido = c("Smith", "Johnson", "Garcia", "Fisher","Johnson", "Garcia", "Fisher")
+)
+
+# Crear ejemplo de df2
+df2 <- data.frame(
+  ID = c(2, 3, 4, 5, 3, 4, 2),
+  Ventas = c(2250, 5047, 5461, 7539, 2250, 5047, 5461)
+)
+
+
+
+```
+
+* Fusión de DF
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Ejemplo de fusión 
+
+merged_df <- df1 |>
+  full_join(df2, by = "ID")
+
+print(merged_df)
+```
+* Agrupacion 
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Ejemplo de agrupación y resumen 
+
+ventas_resumen <- merged_df %>%
+  group_by(Nombre) %>%
+  summarise(Total_Ventas = sum(Ventas))
+
+print(ventas_resumen)
+```
+* Combinación de columnas
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Ejemplo de combinación de columnas
+merged_df <- merged_df %>%
+  mutate(Nueva_Columna = paste(Nombre, Apellido, sep = "-"))
+print(merged_df)
+```
 
 ## Gestión de Datos Ausentes y Selección de Información Relevante
 

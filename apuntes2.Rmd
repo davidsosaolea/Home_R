@@ -298,7 +298,7 @@ sumaDosNumeros <- function(a, b) {
 
 **3.Usa la función en otro script:** \* En otro script o en la consola de R, puedes cargar el script que contiene tus funciones usando la función **'source'**. Aquí hay un ejemplo:
 
-```
+```         
 # scriptPrincipal.R
 
 # Cargar el script que contiene las funciones
@@ -324,24 +324,123 @@ pop_data <- readRDS(file.path(my_dir, "pop_data.rds"))
 
 # Manipulación y Preparación de Datos
 
-## Preparación de Manipulación de Datos
-## Manipulación de Datos
-## Cambio Porcentual/Retorno Sobre la Inversión
+## Comparación de Data Frames
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Definir valores de prueba para DWD_MI_Zip y crime_zip
+DWD_MI_Zip <- c("10001", "20002", "30303", "40004", "50005")
+crime_zip <- c("10001", "30303", "50005", "60006", "70007")
+
+# Comprobar si los conjuntos de códigos postales son idénticos
+identical_result <- identical(DWD_MI_Zip, crime_zip)
+print(paste("Los conjuntos son idénticos:", identical_result))
+```
+
+La función **identical()** se utiliza para verificar si dos objetos son idénticos entre sí. La función devuelve un valor lógico (TRUE o FALSE) según si los objetos son idénticos o no.
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Mostrar los códigos postales que faltan en cada conjunto
+missing_DWD_MI_Zip <- DWD_MI_Zip[!DWD_MI_Zip %in% crime_zip]
+missing_crime_zip <- crime_zip[!crime_zip %in% DWD_MI_Zip]
+
+print("Códigos postales que faltan en DWD_MI_Zip:")
+print(missing_DWD_MI_Zip)
+
+print("Códigos postales que faltan en crime_zip:")
+print(missing_crime_zip)
+```
+
+Este código en R tiene como objetivo identificar y mostrar los códigos postales que faltan en dos conjuntos de datos, **DWD_MI_Zip** y **crime_zip**. Utiliza la función **%in%** para realizar la comparación entre los dos conjuntos y determinar los elementos que no están presentes en ambos.
+
+## Transformar y formatear datos
+
+La librería scales en R proporciona funciones para transformar y formatear datos, especialmente útiles para la visualización de gráficos. Aquí hay un resumen de las principales funciones y utilidades proporcionadas por scales:
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Cargar la biblioteca
+library(scales)
+
+# Numero de prueba
+number <- 5.1234567
+
+# Formato de dolares
+number |> 
+    scales::dollar()
+
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+
+# Formateo de Números como Porcentajes
+number |> 
+    scales::percent(accuracy = 0.01)
+
+```
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Crear un vector de fechas
+dates <- as.Date(c("2022-01-15 12:30:00", "2022-02-20 15:45:00", "2022-03-25 18:15:00"))
+
+# Formatear las fechas en el estilo "día de la semana, mes día, año"
+formatted_dates <- date_format("%A, %B %d, %Y")(dates)
+print(formatted_dates)
+
+```
+
+
+```{r}
+# Crear un vector de horas
+times <- as.POSIXct(c("2022-01-15 12:30:00", "2022-02-20 15:45:00", "2022-03-25 18:15:00"))
+
+# Formatear las horas en el estilo "hora:minuto AM/PM"
+formatted_times <- time_format("%I:%M %p")(times)
+print(formatted_times)
+```
+
+
+```{r}
+# Crear un vector de fechas y horas
+datetime <- as.POSIXct(c("2022-01-15 12:30:00", "2022-02-20 15:45:00", "2022-03-25 18:15:00"))
+
+# Formatear las fechas y horas en el estilo "día de la semana, mes día, año hora:minuto AM/PM"
+formatted_datetime <- date_format("%A, %B %d, %Y %I:%M %p")(datetime)
+print(formatted_datetime)
+
+```
+
+## Filtrar datos
+
+
+
 ## RAR/Rendimiento Anual Promedio
+
 ## TCAC/Tasa de Crecimiento Anual Compuesta
+
 ## Métricas ROI, TMR, TCAC con VDT/Valor del Tiempo del Dinero
+
 ## Técnicas de Fusión y Transformaciones
+
 ## Gestión de Datos Ausentes y Selección de Información Relevante
+
 ## Estructura de Datos Laborales
+
+
 
 # Visualizaciones de Datos
 
 ## Configuración de Estructura de Datos para ggplot y Plotly
+
 ## Visualizaciones Dinámicas y Multi-Panel con ggplot2 y Plotly
+
 ## Visualizaciones de Tendencias Anuales de Precios de Viviendas con Tooltips
+
 ## Visualización de Indicadores Económicos: Valores de Viviendas y Expansión del Mercado Laboral
+
 ## Análisis de la Evolución Porcentual de los Precios de Viviendas Contra el Empleo a Través de Regresión LOESS
+
 ## Explorando Mercados Inmobiliarios: Usando Geom_Bar
+
 ## Representación Gráfica del Ingreso Medio Familiar con Element Text
+
 ## Descifrando el Crecimiento Urbano: Gráfico de Pareto Interactivo de CAGRs por Código Postal
+
 ## Gráfico de Pareto Clásico

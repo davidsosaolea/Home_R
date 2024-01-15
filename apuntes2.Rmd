@@ -1059,3 +1059,67 @@ p |>
 
 ```
 
+# Modelos con LOWESS
+
+LOWESS, que significa "locally weighted scatterplot smoothing" (alisado de gráficos de dispersión ponderado localmente), es un método estadístico utilizado para realizar un suavizado local en datos bidimensionales. LOWESS es un tipo de modelo no paramétrico que se utiliza para explorar la relación entre dos variables, generalmente representadas en un gráfico de dispersión.
+
+El método LOWESS suaviza los datos mediante la aplicación de pesos locales a los puntos de datos en función de su proximidad espacial. Esto significa que el suavizado en cada punto se realiza teniendo en cuenta principalmente los puntos cercanos y asignando pesos más bajos a los puntos más alejados. De esta manera, el modelo se adapta localmente a la variabilidad de los datos y proporciona un suavizado más flexible que algunos métodos globales de suavizado.
+
+Para aplicar el modelo LOWESS, se selecciona un parámetro llamado "ancho de banda" que determina la ventana alrededor de cada punto que se utilizará para calcular el suavizado local. Un ancho de banda más grande incluirá más puntos en el cálculo, lo que dará como resultado un suavizado más suave pero menos sensible a las variaciones locales.
+
+LOWESS es útil en la exploración visual de datos para identificar tendencias o patrones subyacentes, especialmente cuando los datos muestran variabilidad significativa. Este método ha sido utilizado en diversas disciplinas, como estadísticas, econometría y ciencias sociales, para comprender mejor la relación entre variables y detectar tendencias locales en datos ruidosos.
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Carga de bibliotecas ----
+library(tidyverse)  # Paquete para manipulación y visualización de datos
+library(lubridate)  # Paquete para manipulación de fechas
+library(stringr)    # Paquete para manipulación de cadenas de texto
+library(fs)         # Paquete para operaciones con el sistema de archivos
+library(scales)     # Paquete para escalas personalizadas en gráficos
+
+# Carga de la biblioteca ggplot2 si no está cargada
+library(ggplot2)
+
+# Establecer una semilla para reproducibilidad
+set.seed(13)
+
+# Generar datos de ejemplo ----
+x <- seq(1, 200, length.out = 200)  # Secuencia de valores para x
+y <- sin(x/10) + rnorm(200, 0, 0.5)  # Función seno con ruido aleatorio
+
+# Aplicar suavizado LOESS ----
+smoothed_data <- lowess(x, y)
+
+# Graficar los datos originales y suavizados ----
+P1 <- ggplot(mapping = aes(x = x, y = y)) +
+    geom_point(color = "blue") +
+    geom_line(aes(y = smoothed_data$y), color = "red") +
+    ggtitle("LOESS")
+
+P1
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Generar tress modelos con diferentes spans
+# Entre mas bajo el span mas alta la posibilidad de overfitting
+# Cross validation para encontrar el mejor span
+
+model1 <- loess(y ~ x, span = 0.2)
+model2 <- loess(y ~ x, span = 0.5)
+model3 <- loess(y ~ x, span = 0.8)
+
+# Grafico de comparacion de modelos ----
+
+FP <- ggplot(mapping = aes(x = x, y = y)) +
+    geom_point(color = "blue") +
+    geom_line(aes (y = fitted (model1)), color = "red")+
+    geom_line(aes (y = fitted (model2)), color = "black")+
+    geom_line(aes (y = fitted (model3)), color = "yellow")+
+    ggtitle("LOESS")
+
+library(plotly)
+FP |> ggplotly()
+
+
+```
+

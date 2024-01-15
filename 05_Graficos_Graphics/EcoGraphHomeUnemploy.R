@@ -52,6 +52,8 @@ library(ggplot2)
 library(plotly)
 library(tidyquant)
 library(ggrepel)
+getwd()
+setwd("C:/Users/Usuario/Documents/R_class/Analysis_&_Manipulation_De_Datos_En_Espanol/")
 
 
 source("06_funciones_y_interacion_iteration/Zillow_PC_Function.R")

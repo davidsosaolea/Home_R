@@ -376,6 +376,7 @@ number |>
     scales::percent(accuracy = 0.01)
 
 ```
+
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Crear un vector de fechas
 dates <- as.Date(c("2022-01-15 12:30:00", "2022-02-20 15:45:00", "2022-03-25 18:15:00"))
@@ -386,7 +387,6 @@ print(formatted_dates)
 
 ```
 
-
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Crear un vector de horas
 times <- as.POSIXct(c("2022-01-15 12:30:00", "2022-02-20 15:45:00", "2022-03-25 18:15:00"))
@@ -395,7 +395,6 @@ times <- as.POSIXct(c("2022-01-15 12:30:00", "2022-02-20 15:45:00", "2022-03-25 
 formatted_times <- time_format("%I:%M %p")(times)
 print(formatted_times)
 ```
-
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Crear un vector de fechas y horas
@@ -424,7 +423,7 @@ df <- data.frame(
 df
 ```
 
-* Filtrar basado en una condición numérica
+-   Filtrar basado en una condición numérica
 
 ```{r}
 # Filtrar personas mayores de 25 años
@@ -433,7 +432,7 @@ result <- filter(df, Age > 25)
 result
 ```
 
-* Filtrar basado en una condición de texto
+-   Filtrar basado en una condición de texto
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Filtrar personas de género femenino
@@ -441,7 +440,8 @@ result <- filter(df, Gender == "Female")
 
 result
 ```
-* Filtrar utilizando múltiples condiciones
+
+-   Filtrar utilizando múltiples condiciones
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Filtrar personas mayores de 25 años y de género femenino
@@ -451,7 +451,7 @@ result
 
 ```
 
-* Filtrar valores faltantes 
+-   Filtrar valores faltantes
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 6}
 library(naniar)
@@ -485,7 +485,6 @@ datos_con_year <- datos %>%
 datos_con_year
 ```
 
-
 ## Técnicas de Fusión y Transformaciones
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
@@ -506,7 +505,7 @@ df2 <- data.frame(
 
 ```
 
-* Fusión de DF
+-   Fusión de DF
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Ejemplo de fusión 
@@ -516,7 +515,8 @@ merged_df <- df1 |>
 
 merged_df
 ```
-* Agrupacion 
+
+-   Agrupacion
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Ejemplo de agrupación y resumen 
@@ -527,7 +527,8 @@ ventas_resumen <- merged_df %>%
 
 ventas_resumen
 ```
-* Combinación de columnas
+
+-   Combinación de columnas
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Ejemplo de combinación de columnas
@@ -538,6 +539,7 @@ merged_df
 ```
 
 ## Selección de Información Relevante
+
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Seleccionar solo las columnas "Nombre" y "Ventas"
 datos_seleccionados <- select(merged_df, Nombre, Ventas)
@@ -546,13 +548,222 @@ datos_seleccionados <- select(merged_df, Nombre, Ventas)
 datos_seleccionados
 ```
 
-
-
 # Visualizaciones de Datos
 
-## Configuración de Estructura de Datos para ggplot y Plotly
+Los gráficos desempeñan un papel fundamental en el análisis de datos y la visualización de resultados en el ámbito de la programación estadística, y R se destaca como un lenguaje de programación especialmente poderoso para la creación de gráficos.
 
-## Visualizaciones Dinámicas y Multi-Panel con ggplot2 y Plotly
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Cargar bibliotecas necesarias
+library(readxl)
+library(tidyverse)
+library(naniar)
+library(lubridate)
+library(stringr)
+library(fs)
+library(scales)
+library(ggplot2)
+library(plotly)
+library(tidyquant)
+library(ggrepel)
+
+# Fuente de las funciones personalizadas
+source("06_funciones_y_interacion_iteration/Zillow_PC_Function.R")
+source("06_funciones_y_interacion_iteration/funciones_de_importacion.R")
+
+# Obtener datos de ciudades con la Tasa de Crecimiento Anual Compuesta (CAGR) para los años 2000 a 2022
+CAGR_Data <- getTopCitiesByCAGR(2000, 2022, 30)
+
+# Importar datos del Índice del Mercado Inmobiliario de Zillow (ZMI)
+ZMI_Data_Prep <- data_import("ZMI_data_pre")
+
+# Combinar los marcos de datos CAGR_Data y ZMI_Data_Prep en la columna "City_zip"
+ZillowTrends <- CAGR_Data |> left_join(ZMI_Data_Prep, by = "City_zip")
+
+ZillowTrends
+```
+
+## Exploración de datos perdidos
+
+Utilizando la función 'gg_miss_var' de la biblioteca 'naniar' para visualizar los valores perdidos en los datos.
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Grafico de valores faltantes
+ZillowTrends |> gg_miss_var()
+```
+
+## Apreciación de Precios de Viviendas Año tras Año
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Seleccionar las columnas relevantes en el marco de datos ZillowTrends
+ZillowTrends <- ZillowTrends |>
+    select(City_zip, Year, Z_Home_Value_Index, ZHVI_PC_YoY, ZHVI_PC_YoY_chr, timeperiod, Number_of_Years, CAGR)
+
+# Calcular la tasa de crecimiento promedio (CAGR) para todos los datos
+ave_rate <- ZillowTrends |>
+    pull(CAGR) |>
+    mean() |>
+    scales::percent(accuracy = 0.01)
+
+# Obtener el año mínimo y máximo en el conjunto de datos ZillowTrends
+min_y <- ZillowTrends |>
+    pull(Year) |>
+    min()
+
+max_y <- ZillowTrends |>
+    pull(Year) |>
+    max()
+
+# Agregar una nueva columna 'tool_tip' con información para etiquetas emergentes
+ZillowTrends <- ZillowTrends |>
+    mutate(tool_tip = str_glue("CityZip: {City_zip},
+                               %Change: {ZHVI_PC_YoY_chr},
+                               Year: {Year}"))
+
+# Crear un gráfico ggplot
+g <- ZillowTrends |> ggplot(aes(x = Year, y = ZHVI_PC_YoY, color = City_zip, text = tool_tip, group = City_zip)) +
+    geom_line(linewidth = 1) +
+    geom_point(size = 2, alpha = 0.5) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "black", linewidth = 0.50) +
+    labs(
+        title = "Apreciación de Precios de Viviendas Año tras Año",
+        subtitle = str_glue("Cambio porcentual YoY de {min_y} a {max_y}"),
+        x = "AÑO",
+        y = "Cambio Porcentual (%)",
+        caption = str_glue("De {min_y} a {max_y}, la CAGR promedio ha sido {ave_rate} \n para estos 30 principales códigos postales en el Área Metropolitana de Detroit")
+    )
+
+# Mostrar el gráfico
+g
+
+```
+
+##Convierte el gráfico a un gráfico interactivo
+
+Convierte el gráfico creado con ggplot2 a un gráfico interactivo utilizando plotly y especifica que las etiquetas de herramientas deben tomarse de la columna 'tool_tip'.
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+## Gráfico interactivo
+g |> 
+    ggplotly(tooltip = "tool_tip") 
+```
+
+## Apreciación de Precios de Viviendas Año tras Año 2
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Crear un gráfico ggplot con facetas (Plot 2)
+g <- ZillowTrends |> ggplot(aes(x = Year, y = ZHVI_PC_YoY, color = City_zip, text = tool_tip, group = City_zip)) +
+    geom_line(linewidth = 1) +  # Agregar líneas para representar los datos
+    geom_point(size = 2, alpha = 0.5) +  # Agregar puntos para representar los datos
+    geom_hline(yintercept = 0, linetype = "dashed", color = "black", linewidth = 0.50) +  # Agregar línea horizontal en y=0
+    facet_wrap(~ City_zip, scales = "free_y") +  # Facetar el gráfico por código postal con escalas independientes en el eje y
+    labs(
+        title = "Apreciación de Precios de Viviendas Año tras Año",
+        subtitle = str_glue("Cambio porcentual YoY de {min_y} a {max_y}"),
+        x = "AÑO",
+        y = "Cambio Porcentual (%)",
+        caption = str_glue("De {min_y} a {max_y}, la CAGR promedio ha sido {ave_rate} \n para estos 30 principales códigos postales en el Área Metropolitana de Detroit")
+    ) +
+    theme_minimal() +  # Puedes ajustar el tema según tus preferencias
+    theme(
+        plot.title = element_text(size = 20, face = "bold"),
+        axis.title.x = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text.x = element_text(size = 6),
+        axis.text.y = element_text(size = 6),
+        legend.text = element_text(size = 12)
+    ) +
+    guides(color = guide_legend(override.aes = list(size = 4)))  # Ajustar el tamaño de la leyenda
+
+g
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+
+# Convertir el gráfico ggplot a una versión interactiva usando plotly
+g_plotly <- g |> ggplotly(tooltip = "tool_tip")
+
+# Ajustar el tamaño del gráfico plotly
+g_plotly <- g_plotly %>%
+    config(displayModeBar = TRUE) %>%  # Puedes desactivar la barra de herramientas si lo prefieres
+    layout(width = 1000, height = 600)  # Ajustar el tamaño según tus preferencias
+
+# Mostrar el gráfico plotly
+g_plotly
+
+```
+
+## Precios de Viviendas vs Empleo
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+
+# Importar datos relevantes para el Plot 3
+ZMI_Data_Prep
+Employment_C <- data_import("Employment_C")
+
+# Calcular el promedio del cambio porcentual YoY del índice de valor de la vivienda (ZHVI_PC_YoY) por año
+avg_zhvi_pc_by_year <- ZMI_Data_Prep |>
+    group_by(Year) |> 
+    summarise("Home Value Index" = ZHVI_PC_YoY |> mean())
+
+# Combinar datos de empleo y datos del índice de valor de la vivienda por año
+homev_vs_Job_growth <- Employment_C |>
+    left_join(avg_zhvi_pc_by_year, by = "Year") |>
+    select(Year, PC_YoY, "Home Value Index") |>
+    mutate("Employment in Metro Detroit" = PC_YoY) |>
+    gather(key = "Legend", value = "Percentage_Change", "Employment in Metro Detroit", "Home Value Index")
+
+# Modificar el formato de porcentaje y la etiqueta del texto
+homev_vs_Job_growth <- homev_vs_Job_growth |>
+    mutate(PC_YoY_chr = Percentage_Change |> scales::percent(accuracy = 0.01)) |>
+    mutate(Percentage_Change = (Percentage_Change * 100)) |>
+    mutate(label_text = str_glue("Legend:{Legend},
+                                 Year:{Year},
+                                 Percentage:{PC_YoY_chr}"))
+
+# Calcular el número de códigos postales únicos en ZMI_Data_Prep
+num_of_zip <- ZMI_Data_Prep |> select(City_zip) |> unique() |> nrow()
+
+# Crear el gráfico ggplot para el Plot 3
+p3 <- homev_vs_Job_growth |>
+    drop_na(Percentage_Change) |>
+    ggplot(aes(x = Year, y = Percentage_Change, linetype = Legend, colour = Legend, label = label_text)) +
+    geom_line(linewidth = 1) +
+    geom_point(aes(text = label_text), size = 2) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "gray0", size = 0.50)+
+    labs(
+        title = "Precios de Viviendas vs Empleo",
+        subtitle = "Cambio Porcentual YoY entre Precios de Viviendas y Empleo",
+        y = "Cambio Porcentual (%)",
+        caption = str_glue("Las fuentes de datos son 'Zillow' y 'Bureau of Labor Statistics'.
+        Los datos de empleo son del área de Empleo de Detroit-Warren-Dearborn. 
+        El Índice de Valor de la Vivienda es la media del cambio de {num_of_zip} códigos postales en el área de Detroit-Warren-Dearborn.'"
+    )) +
+    theme_light()
+
+# Convertir el gráfico ggplot a una versión interactiva usando plotly
+p3_plotly <- p3 |> ggplotly(tooltip = "text")
+
+# Mostrar el gráfico plotly
+p3_plotly
+
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+
+p3 + scale_colour_brewer(palette = "Set1")
+
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+
+p3 + theme (
+    
+    plot.title    = element_text(color="dark blue", size = 12, face = "bold"),
+    plot.subtitle = element_text(color="dark blue", size = 10, face = "italic"),
+    plot.caption  = element_text(color="dark blue", size = 8, face = "bold.italic")
+)    
+    
+```
+
 
 ## Visualizaciones de Tendencias Anuales de Precios de Viviendas con Tooltips
 

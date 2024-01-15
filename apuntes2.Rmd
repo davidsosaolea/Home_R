@@ -765,7 +765,7 @@ p3 + theme (
 ```
 
 
-## LOSSE Regresion
+## Regresión LOESS
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 
 ## (LOESS) Local Polynomial Regression
@@ -851,15 +851,211 @@ p4 |>
 ```
 
 
-
-## Visualización de Indicadores Económicos: Valores de Viviendas y Expansión del Mercado Laboral
-
-## Análisis de la Evolución Porcentual de los Precios de Viviendas Contra el Empleo a Través de Regresión LOESS
-
 ## Explorando Mercados Inmobiliarios: Usando Geom_Bar
 
-## Representación Gráfica del Ingreso Medio Familiar con Element Text
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Crear un conjunto de datos combinando datos de empleo y datos del índice de valor de la vivienda por año (Plot 5)
+homev_vs_Job_growth_III <- Employment_C |>
+    left_join(avg_zhvi_pc_by_year, by = "Year") |>
+    select(Year, PC_YoY, "Home Value Index") |>
+    mutate(Employment = PC_YoY) |>
+    mutate(Home_Value_Index = `Home Value Index`)
 
-## Descifrando el Crecimiento Urbano: Gráfico de Pareto Interactivo de CAGRs por Código Postal
+# Añadir nuevas columnas con porcentajes y texto para etiquetas
+homev_vs_Job_growth_III <- homev_vs_Job_growth_III |>
+    mutate(Home_Value_Index_PC = `Home Value Index` |> scales::percent(accuracy = 0.01)) |>
+    mutate(Employment_PC = PC_YoY |> scales::percent(accuracy = 0.01)) |>
+    mutate(label_text1 = str_glue("Employment: {Employment_PC}")) |>
+    mutate(label_text2 = str_glue("Home Value Index: {Home_Value_Index_PC}")) |>
+    mutate(label_text3 = str_glue("E: {Employment_PC}%")) |>
+    mutate(label_text4 = str_glue("H: {Home_Value_Index_PC}%"))
+
+# Obtener el rango de años
+miny <- homev_vs_Job_growth_III |> pull(Year) |> min()
+max_y <- homev_vs_Job_growth_III |> pull(Year) |> max()
+
+# Crear un gráfico de barras apiladas
+p5 <- ggplot(homev_vs_Job_growth_III) +
+    geom_bar(
+        aes(Year, Employment, text = label_text1),
+        stat = "identity",
+        position = "dodge",
+        fill = "cadetblue1",
+        color = "black"
+    ) +
+    
+    geom_bar(
+        aes(Year, Home_Value_Index, text = label_text2),
+        stat = "identity",
+        position = "dodge",
+        fill = "navy",
+        color = "black",
+        alpha = 0.3
+    ) +
+    
+    scale_y_continuous(labels = scales::percent) +
+    
+    labs(
+        title = "Precios de Viviendas vs Empleo",
+        caption = str_glue("Fuentes de datos: Zillow y Bureau Labor of Statistics \n Marco temporal: {min_y} {max_y}")
+    ) +
+    
+    geom_label(
+        aes(Year, Employment, label = label_text3),
+        hjust = "left",
+        vjust = "top",
+        size = 3
+    ) +
+    
+    geom_label(
+        aes(Year, Home_Value_Index, label = label_text4),
+        hjust = "right",
+        vjust = "bottom",
+        size = 3
+    )
+
+# Convertir el gráfico ggplot a una versión interactiva usando plotly
+p5 |> ggplotly(tooltip = "text") |> 
+    layout(
+        title = list(
+            text = paste(
+                'Precios de Viviendas vs Empleo',
+                '<br>',
+                '<sup>',
+                '<b>', 'Fuentes de datos:',
+                '</b>', "(Zillow) & (Bereau Labor of Statistics)",
+                '</sup>'
+            )
+        )
+    )
+
+```
+
+
+## Representación Gráfica del Ingreso Medio Familiar
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+
+# Extraer códigos postales y convertirlos a formato entero
+CAGR_Data_zip <- CAGR_Data |>
+    mutate(zip = str_extract(City_zip, pattern = "\\d{5}")) |>
+    mutate(zip = zip |> as.integer())
+
+# Importar datos demográficos
+demographics <- data_import(dataSource = "Demographis")
+
+# Combinar datos de CAGR con datos demográficos utilizando códigos postales
+demographics_CAGR <-  CAGR_Data_zip |> left_join(demographics, by = "zip")
+
+# Visualizar la estructura de datos
+demographics_CAGR |> glimpse()
+```
+
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Agregar una columna de texto para etiquetas
+demographics_CAGR <- demographics_CAGR |>
+    mutate(label_text = str_glue("Household Median Income: {House_Hold_Median_Income |> scales::dollar()}"))
+
+# Crear un gráfico de barras
+p6 <- ggplot(demographics_CAGR, aes(x = reorder(City_zip, -House_Hold_Median_Income))) +
+    geom_bar(
+        aes(y = House_Hold_Median_Income, text = label_text),
+        stat = "identity",
+        color = "black", fill = "skyblue"
+    ) +
+    scale_y_continuous(name = "Median Income", labels = scales::dollar) +
+    labs(x = "ZipCode") +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90))
+
+# Convertir el gráfico ggplot a una versión interactiva usando plotly
+g_plotly <- p6 |> ggplotly(tooltip = "label_text") |> 
+    layout(
+        title = list(
+            text = paste0('<br>',
+                          'Household Median Income',
+                          '</br>',
+                          '<br>',
+                          '<sup>',
+                          '<b>',
+                          'Note:',
+                          '</b>', 'These ZipCodes have the higher CAGR in Metro Detroit',
+                          '</sup>')
+        )
+    )
+
+# Ajustar el tamaño del gráfico plotly
+g_plotly <- g_plotly %>%
+    config(displayModeBar = TRUE) %>%  # Puedes desactivar la barra de herramientas si lo prefieres
+    layout(width = 1000, height = 600)  # Ajustar el tamaño según tus preferencias
+
+# Mostrar el gráfico plotly
+g_plotly
+```
+
 
 ## Gráfico de Pareto Clásico
+
+El Gráfico de Pareto es una herramienta visual poderosa utilizada en gestión y mejora de procesos para identificar y priorizar problemas o causas, centrándose en aquellos que tienen el mayor impacto. Su nombre proviene del principio de Pareto, que sugiere que aproximadamente el 80% de los problemas provienen del 20% de las causas. 
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Data Preparation
+data <- data.frame(
+    Category = c("Dose Missed",
+                 "Wrong Time",
+                 "Overdose",
+                 "Wrong Patient",
+                 "Wrong Drug",
+                 "Wrong Calculation",
+                 "Duplicated Dose",
+                 "Under Dose",
+                 "Wrong Rate",
+                 "Technique Error",
+                 "Unauthorized Drug"),
+    Frequency = c(92, 83, 76, 59, 53, 27, 16, 9, 7, 4, 3)
+)
+
+# Ordenar los datos por frecuencia en orden descendente
+data <- data |>
+    arrange(desc(Frequency)) |>
+    # Calcular la suma acumulativa y el porcentaje acumulativo
+    mutate(Cumulative = cumsum(Frequency)) |>
+    mutate(Cumulative_Percent = Cumulative / sum(Frequency) * 100)
+
+# Crear un gráfico de barras y línea (Pareto Chart)
+p <- ggplot(data, aes(x = reorder(Category, -Frequency), y = Frequency)) +
+    geom_bar(
+        aes(text = paste("Category:", Category, "<br>Frequency:", Frequency)),
+        stat = "identity",
+        fill = "blue"
+    ) +
+    geom_line(
+        aes(y = Cumulative_Percent,
+            group = 1,
+            text = paste("Category:", Category, "<br>Cumulative %:", sprintf("%.2f", Cumulative_Percent))),
+        colour = "red"
+    ) +
+    geom_point(
+        aes(y = Cumulative_Percent,
+            text = paste("Category:", Category, "<br>Cumulative %:", sprintf("%.2f", Cumulative_Percent))),
+        colour = "red"
+    ) +
+    # Agregar una línea de referencia en el 80% para el Pareto
+    geom_hline(aes(yintercept = 80), linetype = "dashed", color = "green") +
+    # Agregar eje secundario para el porcentaje acumulativo
+    scale_y_continuous(sec.axis = sec_axis(~ ., name = "Cumulative %")) +
+    theme_minimal() +
+    labs(
+        x = "Type of Medication Errors",
+        y = "Frequency #",
+        title = str_glue("Pareto Chart Types of Medication Errors (n = {data$Frequency |> sum()})")
+    ) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Convertir el gráfico ggplot a una versión interactiva usando plotly
+p |>
+    ggplotly(tooltip = "text")
+
+```
+

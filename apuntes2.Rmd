@@ -765,7 +765,92 @@ p3 + theme (
 ```
 
 
-## Visualizaciones de Tendencias Anuales de Precios de Viviendas con Tooltips
+## LOSSE Regresion
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+
+## (LOESS) Local Polynomial Regression
+
+# Combinar datos de empleo y datos del índice de valor de la vivienda por año
+homev_vs_Job_growth_II <- Employment_C |>
+    left_join(avg_zhvi_pc_by_year, by = "Year") |>
+    select(Year, PC_YoY, "Home Value Index") |>
+    mutate(Employment = PC_YoY) |>
+    mutate(Home_Value_Index = `Home Value Index`) |>
+    filter(Year > 1999)
+
+# Ajustar un modelo LOESS (Local Polynomial Regression)
+mod <- loess(Home_Value_Index ~ Employment, data = homev_vs_Job_growth_II)
+grid <- tibble(Employment = seq(min(homev_vs_Job_growth_II$Employment), max(homev_vs_Job_growth_II$Employment), length = 50))
+grid$Home_Value_Index <- predict(mod, newdata = grid)
+
+# Calcular residuos estandarizados y identificar valores atípicos
+std_resid <- resid(mod) / mod$s
+outlier <- filter(homev_vs_Job_growth_II, abs(std_resid) > 1)
+outlier
+
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Crear un gráfico ggplot para el modelo LOESS
+
+p4 <- ggplot(homev_vs_Job_growth_II, aes(Employment, Home_Value_Index)) +
+    geom_point() +
+    geom_line(data = grid, colour = "blue", size = 1.5) + 
+    ggrepel::geom_text_repel(data = outlier, aes(label = Year)) +
+    
+    labs(
+        title = "Regresión LOESS",
+        y = "Cambio Promedio % Índice de Valor de la Vivienda",
+        x = "Cambio Promedio % Empleo",
+        caption = "La regresión LOESS, a veces llamada regresión local, es un método que utiliza el ajuste local para ajustar un modelo de regresión a un conjunto de datos"
+    )
+
+# Añadir anotaciones al gráfico
+p4 + annotate(geom = "curve",
+              x = -0.10,
+              y = 0.09,
+              xend = -0.106,
+              yend = 0.055,
+              curvature = 0.3, arrow = arrow(length = unit(2, "mm"))) +
+    annotate(geom = "text", x = -0.10, y = 0.09, label = "Pandemia Global", hjust = "left")
+
+```
+
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+
+## LOESS & ggplotly
+
+# Modificar el formato de porcentaje y la etiqueta del texto para ggplotly
+homev_vs_Job_growth_II <- homev_vs_Job_growth_II |>
+    mutate(Home_Value_Index_ch = Home_Value_Index |> scales::percent(accuracy = 0.01)) |>
+    mutate(Employment_ch = PC_YoY |> scales::percent(accuracy = 0.01)) |>
+    mutate(label_text  = str_glue("Year: {Year},
+                                   Home Value Index: {Home_Value_Index_ch},
+                                   Employment: {Employment_ch}"))
+
+# Crear un gráfico ggplotly interactivo
+p4 <- ggplot(homev_vs_Job_growth_II, aes(Employment, Home_Value_Index)) +
+    geom_point(aes(text = label_text), size = 2) +
+    geom_line(data = grid, colour = "blue", size = 1.5) + 
+    ggrepel::geom_text_repel(data = outlier, aes(label = Year)) +
+    
+    labs(
+        title = "Regresión LOESS",
+        y = "Cambio Promedio % Índice de Valor de la Vivienda",
+        x = "Cambio Promedio % Empleo",
+        caption = "La regresión LOESS, a veces llamada regresión local, es un método que utiliza el ajuste local para ajustar un modelo de regresión a un conjunto de datos"
+    ) +
+    scale_y_continuous(labels = scales::percent) +
+    scale_x_continuous(labels = scales::percent)
+
+# Convertir el gráfico ggplotly a una versión interactiva
+p4 |>
+    ggplotly(tooltip = "text")
+
+```
+
+
 
 ## Visualización de Indicadores Económicos: Valores de Viviendas y Expansión del Mercado Laboral
 

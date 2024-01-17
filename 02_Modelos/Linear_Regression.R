@@ -94,12 +94,64 @@ glimpse (model_data)
 model_data <- model_data |> na.omit()
 
 
+#> Manejar Valores atípicos
+#> 1. Eliminar valores atípicos con SD:
 
+# calcular estadisticas
 
+mean_price <- mean(model_data$price, na.rm = T) 
+sd_price <- sd(model_data$price, na.rm = T)
 
+outliers <- model_data$price < (mean_price - 3 * sd_price) | model_data$price > (mean_price + 3*  sd_price)
+model1_no_outliers_sd_method <- model_data[!outliers, ]
+model1_no_outliers_sd_method |> glimpse()
 
+#> 2. Eliminar valores atipicos con el metodo IQR
+#> Este metodo utiliza el Rango Intercuartil (IQR)
+#> Cualquier Valor que caiga por debajo de Q1 1.5 IQR o por encima de Q3 + 1.5 IQR se puede considerar un valor atipico
 
+Q1 <- quantile(model_data$price, .25)
+Q3 <- quantile (model_data$price, .75)
+IQR <- Q3 - Q1
 
+outliers <- model_data$price < (Q1 - 1.5 * IQR) | model_data$price > (Q3 + 1.5 * IQR)
+
+model2_no_outliers_IQR_method <- model_data[!outliers, ]
+glimpse (model2_no_outliers_IQR_method)
+
+#3. Usar método Robustos----
+
+#> Métodos robustos como el de median absolute deviation (MAD)
+#> se puede usar cuando se tienen datos que no siguen una distribución normal.
+
+# calcular MAD
+
+MAD <- mad (model_data$price, constant = 1)
+
+# valores atípicos
+
+outliers <- abs(model_data$price - median(model_data$price))/MAD > 2
+model3_no_outliers_rubust_method <- model_data[!outliers, ]
+model3_no_outliers_rubust_method |> glimpse()
+
+# Comprbacion de linealidad 
+
+variables <- list("bathrooms", "bedrooms", "squareFootage", "zipCode")
+# Definir una función para crear un gráfico de dispersión
+#!! sym(variable) para evaluar la variable como símbolo
+# el operador !! se utiliza par evaluar este símbolo dentro de la función aes()
+
+create_scatter_plot_fun <- function(variables){
+    ggplot(model1_no_outliers_sd_method, aes(!!sym(variables), price)) +
+        geom_point() +
+        labs(title = paste("Grafico de dispersion de precio vs", variables),
+             x=variables,
+             y="Precio")
+}
+
+plots <- map(variables, create_scatter_plot_fun)
+
+grid.arrange(plots [[1]], plots [[2]], plots[[3]], plots[[4]], ncol = 2)
 
 
 

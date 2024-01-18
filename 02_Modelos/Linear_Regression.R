@@ -137,6 +137,7 @@ model3_no_outliers_rubust_method |> glimpse()
 # Comprbacion de linealidad 
 
 variables <- list("bathrooms", "bedrooms", "squareFootage", "zipCode")
+
 # Definir una función para crear un gráfico de dispersión
 #!! sym(variable) para evaluar la variable como símbolo
 # el operador !! se utiliza par evaluar este símbolo dentro de la función aes()
@@ -154,17 +155,140 @@ plots <- map(variables, create_scatter_plot_fun)
 grid.arrange(plots [[1]], plots [[2]], plots[[3]], plots[[4]], ncol = 2)
 
 
+#2. Gráficos de Residuos
+
+data_sets <- list("modell_no_outliers_sd_method"      = model1_no_outliers_sd_method,
+                  "model2_no_outliers_IQR_method"     = model2_no_outliers_IQR_method, 
+                  "model3_no_outliers_rubust_method"  = model3_no_outliers_rubust_method)
+
+# Definir la formula para los modelos
+
+formula <- price ~ bathrooms + bedrooms + squareFootage + zipCode
+
+# Ajustar un modelo a cada conjunto de datos y almacenar los modelos en una lista 
+
+models <- map(data_sets, ~ lm(formula, data = .x))
+
+create_residuals_plot_fun <- function(model, model_name) {
+    ggplot() +
+        geom_point(aes (x = model$fitted.values, y = model$residuals)) +
+        
+        labs(
+            title = paste("Residuos vs Valores Ajustados para", model_name), 
+            x = "Valores Ajustados",
+            y = "Residuos"
+            )
+}
+
+plots  <-  map2(models, names (models), create_residuals_plot_fun)
+grid.arrange (plots [[1]], plots[[2]], plots[[3]], ncol = 2)
+
+
+# Normal Q - Q
+
+models <-  list("modell_no_outliers_sd_method"      = lm( price ~ bathrooms + bedrooms + squareFootage + zipCode, data = model1_no_outliers_sd_method),
+                "model2_no_outliers_IQR_method"     = lm( price ~ bathrooms + bedrooms + squareFootage + zipCode, data = model2_no_outliers_IQR_method), 
+                "model3_no_outliers_rubust_method"  = lm( price ~ bathrooms + bedrooms + squareFootage + zipCode, data = model3_no_outliers_rubust_method))
+
+
+create_qq_plot <- function(model_name, model){
+    residuals  <- model$residuals
+    qqplot <- ggqqplot(residuals) +
+        ggtitle(paste("Grafico Q-Q para", model_name))
+    return(qqplot)
+    
+}
+
+plots  <-  map2 (names (models), models, create_qq_plot)
+combined_plot <- wrap_plots (plots, ncol = 2)
+combined_plot
+
+
+# 3. coeficiente de Correlación:
+#> El coeficiente de correlación mide la fuerza y dirección de la relación lineal entre 2 variables.
+#> -1 a 1.
+#> si el valor es cercano a @ incidida que no hay relación lineal
+
+cor(model1_no_outliers_sd_method$price, model1_no_outliers_sd_method$bathrooms, use = "complete.obs")
+cor(model1_no_outliers_sd_method$price, model1_no_outliers_sd_method$bedrooms, use = "complete.obs")
+cor(model1_no_outliers_sd_method$price, model1_no_outliers_sd_method$squareFootage, use = "complete.obs")
+
+
+#> Transformaciones de Datos.
+#> Si un predictor (variable independiente) tiene una relación no lineal con la respuesta (variable dependiente), #> podríamos considerar transformar el predicter, la respuesta, o ambos para lograr linealidad.
+
+m1_log <- model1_no_outliers_sd_method |>
+    mutate (squareFootage = log(squareFootage))
+
+m1_sqrt <- model1_no_outliers_sd_method |>
+    mutate (squareFootage = sqrt(squareFootage))
+
+m1_sq2 <-  model1_no_outliers_sd_method |>
+    mutate (squareFootage = (squareFootage)^2)
+
+models <- list("modell no outliers sd method" = lm(price ~ bathrooms + bedrooms + squareFootage + zipCode, data = model1_no_outliers_sd_method),
+               "ml log" = lm(price ~ bathrooms + bedrooms + squareFootage + zipCode, data = m1_log),
+               "m1 sqrt"= lm(price ~ bathrooms + bedrooms + squareFootage + zipCode, data = m1_sqrt),
+               "m1_5q2" = lm(price ~ bathrooms + bedrooms + squareFootage + zipCode, data = m1_sq2))
+
+create_residuals_plot <- function(model_name, model) {
+    ggplot() +
+        geom_point(aes (x = model$fitted.values, y = model$residuals)) +
+        labs (
+            title = paste("Residuos vs Valores Ajustados para", model_name), x = "Valores Ajustados",
+            y= "Residuos"
+        )
+}
+
+plots <- map2(names (models), models, create_residuals_plot)
+grid.arrange(plots [[1]], plots[[2]], plots[[3]], plots[[4]], ncol = 2)
+
+
+#> Convertir a Factores
+#> E.g. el color de un coche (rojo, azul, verde etc..)
+
+map(data_sets, str)
+
+mutate_data_to_fct <- function(df) {
+    df <- df |> mutate_at(c("zipCode", "year"), as.factor) 
+    return(df)
+}
+data_sets <- map(data_sets, mutate_data_to_fct)
 
 
 
 
+# > Partición de Datos
 
+split_data_fun <- function(df, varl, var2) {
+    
+    levels1 <- unique (df[[var1]])
+    levels2 <- unique (df[[var2]])
+    
+    training_indices <- c()
+    testing_indices <- c()
+    
+    for (levels1 in levels1) {
+        for (levels2 in levels2) {
+            
+            rows <- which (df[[var1]] == level1 & df[[var2]] == levels2)
+            
+            if (length(rows) < 2 ) {
+                # Si solo hay una instancia, añadirla a los datos de entrenamiento
+                
+                training_indices <- c(training_indices, rows)
+            } else {
+                
+                partition <- createDataPartition(y = rows, p = 0.70, list = FALSE)
+                training_indices <- c(training_indices, rows [partition])
+                testing_indices <- c(testing_indices, rows[-partition])
+            }
+            
+        }
+    }
 
-
-
-
-
-
-
-
-
+list(
+        training = df[training_indices, ],
+        testing = df[testing_indices, ]
+        )
+}

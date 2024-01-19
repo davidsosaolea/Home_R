@@ -65,7 +65,7 @@ library(broom)     # ayuda con el ordenamiento de objetos de modelos
 library(Metrics)
 library(plotly)
 
-setwd("R_class/Analysis_&_Manipulation_De_Datos_En_Espanol/")
+#setwd("R_class/Analysis_&_Manipulation_De_Datos_En_Espanol/")
 
 #Cargar los datos de listados de alquileres
 rent_data <- read_rds(file = "01_Informacion_Data/Rental_Listing_Data/Rental_Listings.RDS")
@@ -102,7 +102,7 @@ model_data <- model_data |> na.omit()
 mean_price <- mean(model_data$price, na.rm = T) 
 sd_price <- sd(model_data$price, na.rm = T)
 
-outliers <- model_data$price < (mean_price - 3 * sd_price) | model_data$price > (mean_price + 3*  sd_price)
+outliers <- model_data$price < (mean_price - 3 * sd_price) | model_data$price > (mean_price + 3 *  sd_price)
 model1_no_outliers_sd_method <- model_data[!outliers, ]
 model1_no_outliers_sd_method |> glimpse()
 
@@ -215,7 +215,8 @@ cor(model1_no_outliers_sd_method$price, model1_no_outliers_sd_method$squareFoota
 
 
 #> Transformaciones de Datos.
-#> Si un predictor (variable independiente) tiene una relación no lineal con la respuesta (variable dependiente), #> podríamos considerar transformar el predicter, la respuesta, o ambos para lograr linealidad.
+#> Si un predictor (variable independiente) tiene una relación no lineal con la respuesta (variable dependiente), 
+#> podríamos considerar transformar el predicter, la respuesta, o ambos para lograr linealidad.
 
 m1_log <- model1_no_outliers_sd_method |>
     mutate (squareFootage = log(squareFootage))

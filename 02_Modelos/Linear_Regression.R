@@ -157,7 +157,7 @@ grid.arrange(plots [[1]], plots [[2]], plots[[3]], plots[[4]], ncol = 2)
 
 #2. Gráficos de Residuos
 
-data_sets <- list("modell_no_outliers_sd_method"      = model1_no_outliers_sd_method,
+data_sets <- list("model1_no_outliers_sd_method"      = model1_no_outliers_sd_method,
                   "model2_no_outliers_IQR_method"     = model2_no_outliers_IQR_method, 
                   "model3_no_outliers_rubust_method"  = model3_no_outliers_rubust_method)
 
@@ -186,7 +186,7 @@ grid.arrange (plots [[1]], plots[[2]], plots[[3]], ncol = 2)
 
 # Normal Q - Q
 
-models <-  list("modell_no_outliers_sd_method"      = lm( price ~ bathrooms + bedrooms + squareFootage + zipCode, data = model1_no_outliers_sd_method),
+models <-  list("model1_no_outliers_sd_method"      = lm( price ~ bathrooms + bedrooms + squareFootage + zipCode, data = model1_no_outliers_sd_method),
                 "model2_no_outliers_IQR_method"     = lm( price ~ bathrooms + bedrooms + squareFootage + zipCode, data = model2_no_outliers_IQR_method), 
                 "model3_no_outliers_rubust_method"  = lm( price ~ bathrooms + bedrooms + squareFootage + zipCode, data = model3_no_outliers_rubust_method))
 
@@ -227,7 +227,7 @@ m1_sqrt <- model1_no_outliers_sd_method |>
 m1_sq2 <-  model1_no_outliers_sd_method |>
     mutate (squareFootage = (squareFootage)^2)
 
-models <- list("modell no outliers sd method" = lm(price ~ bathrooms + bedrooms + squareFootage + zipCode, data = model1_no_outliers_sd_method),
+models <- list("model1 no outliers sd method" = lm(price ~ bathrooms + bedrooms + squareFootage + zipCode, data = model1_no_outliers_sd_method),
                "ml log" = lm(price ~ bathrooms + bedrooms + squareFootage + zipCode, data = m1_log),
                "m1 sqrt"= lm(price ~ bathrooms + bedrooms + squareFootage + zipCode, data = m1_sqrt),
                "m1_5q2" = lm(price ~ bathrooms + bedrooms + squareFootage + zipCode, data = m1_sq2))
@@ -261,35 +261,109 @@ data_sets <- map(data_sets, mutate_data_to_fct)
 
 # > Partición de Datos
 
-split_data_fun <- function(df, varl, var2) {
+split_data_fun <- function(df, var1, var2) {
     
     levels1 <- unique (df[[var1]])
     levels2 <- unique (df[[var2]])
     
     training_indices <- c()
-    testing_indices <- c()
+    testing_indices  <- c()
     
-    for (levels1 in levels1) {
-        for (levels2 in levels2) {
+    for (level1 in levels1) {
+        for (level2 in levels2) {
             
-            rows <- which (df[[var1]] == level1 & df[[var2]] == levels2)
+            rows <- which(df[[var1]] == level1 & df[[var2]] == level2)
             
             if (length(rows) < 2 ) {
                 # Si solo hay una instancia, añadirla a los datos de entrenamiento
                 
                 training_indices <- c(training_indices, rows)
+                
             } else {
                 
-                partition <- createDataPartition(y = rows, p = 0.70, list = FALSE)
+                partition        <- createDataPartition(y = rows, p = 0.70, list = FALSE)
                 training_indices <- c(training_indices, rows [partition])
-                testing_indices <- c(testing_indices, rows[-partition])
+                testing_indices  <- c(testing_indices, rows[-partition])
             }
             
         }
     }
-
-list(
+    list(
         training = df[training_indices, ],
         testing = df[testing_indices, ]
         )
 }
+
+split_data_frames <- map(data_sets, ~ split_data_fun(.x, "year", "zipCode" ))
+
+
+model <- lm(price ~ year
+            + bathrooms
+            + bedrooms
+            + squareFootage * zipCode, data = split_data_frames$model1_no_outliers_sd_method$training) 
+
+model2 <- lm(price ~ year
+                 + bathrooms
+                 + bedrooms
+                 + squareFootage * zipCode, data = split_data_frames$model2_no_outliers_IQR_method$training)
+
+model3 <- lm(price ~ year
+                 + bathrooms
+                 + bedrooms
+                 + squareFootage * zipCode, data = split_data_frames$model3_no_outliers_rubust_method$training)
+
+## obtener resultados
+
+summary_model  <- summary(model)
+summary_model2 <- summary(model2)
+summary_model3 <- summary(model3)
+
+glance_model  <- broom::glance(model)
+glance_model2 <- broom::glance(model2)
+glance_model3 <- broom::glance(model3)
+
+# Obtener los intervalos de confianza
+confint_model  <- confint(model, level = 0.95)
+confint_model2 <- confint(model2, level = 0.95)
+confint_model3 <- confint(model3, level = 0.95)
+
+# Gráficos de Predicción
+
+m1 <- split_data_frames$model1_no_outliers_sd_method$testing
+m2 <- split_data_frames$model2_no_outliers_IQR_method$testing 
+m3 <- split_data_frames$model3_no_outliers_rubust_method$testing
+
+# Crear una lista para los modelos
+models <- list(model = model, model2 = model2, model3 = model3)
+
+# Crear una una lista para el testing data 
+
+datasets <- list(m1 = m1, m2 = m2, m3 = m3)
+
+# Función para añadir predicciones a los datos
+
+add_preditions <- function(dataset, model) {
+    dataset$predicted <- predict(object = model, newdata = dataset)
+    dataset
+}
+
+datasets <- mapply(add_preditions, datasets, models, SIMPLIFY = FALSE)
+
+# Función para crear 3 gráficos
+
+create_parity_plot <- function(dataset, name){
+    
+    ggplot(dataset, aes (x = price, y = predicted)) +
+        geom_point() +
+        geom_abline(color = "red", linetype = "dashed") +
+        labs(
+            x = "Precio Observado",
+            y = "Precio Predicho",
+            title = paste("Grafico de Paridad: Precio Observado vs Predicho (",name,")") +
+            theme_minimal()
+            )
+}
+
+plots <- imap(datasets, ~ create_parity_plot(.x, .y))
+
+grid.arrange(grobs = plots, ncol = 3)

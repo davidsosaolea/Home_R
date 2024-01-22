@@ -1,0 +1,63 @@
+---
+title: "Análisis de Zonas de Alto Alquiler"
+author: "BIDDSA"
+date: "2024-01-14"
+output: html_document
+---
+
+Este informe fue uno de los reportes escritos que creé para uno de mis clientes, David, y me gustaría presentarlo aquí. Creo que el análisis de datos puede ayudar a tomar mejores decisiones financieras no solo para usted, sino también para otros. David, como muchos otros, anhelaba una manera inteligente de invertir su dinero. Pensó en invertir en una propiedad de alquiler para diversificar su efectivo. Pero había un problema: no sabía por dónde empezar. El sector inmobiliario parecía complicado y se sentía perdido con todas las opciones. No puedo compartir sus datos financieros aquí, pero demostraré un segmento del análisis sobre cómo utilicé datos públicos para crear un plan de recomendación para que invirtiera en su primera propiedad de alquiler. Espero que lo disfruten
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+
+Puntos de Conversación
+(1) Enfocándose en Zonas de Alto Alquiler en Detroit Metropolitano Basado en Precios de Alquiler de 2019 a 2023.
+
+Enfoque y Lógica del Análisis
+Demografía de Alto Alquiler: Entendiendo el tipo de personas atraídas por áreas de alto alquiler.
+Implicaciones de Marketing: Cómo estas demografías influyen en el marketing futuro.
+Tabulación: Tabla que muestra ciudades y códigos postales que cumplen con los criterios.
+Estrategia de Agrupación: Cómo la segmentación de unidades puede ayudar en la selección de códigos postales.
+Áreas de Enfoque: Ubicación Ubicación Ubicación
+(2) Implicaciones Financieras
+
+Valor y Ganancias: Discusión sobre el valor de las propiedades y las ganancias de capital esperadas.
+Riesgos y Tasas: Perspectivas sobre tasas de vacancia y morosidad en áreas de alto alquiler.
+Compensaciones Financieras: Resaltando los riesgos financieros en áreas de alto alquiler.
+(3) Perspectivas de Datos a través de la Visualización
+
+Diagrama de Caja: Representación gráfica simple de la distribución de un conjunto de datos.
+Agrupación en Diagramas de Caja: Presentar datos con diferentes escalas puede ayudar a contar una historia más matizada.
+Agrupación en un Solo Diagrama de Caja: Ayuda a realizar comparaciones visuales directas entre las distribuciones de precios de alquiler de cada año.
+(4) Modelización y Predicción
+
+Metodología: Uso del Modelo de Regresión Lineal para la estimación de alquileres.
+Calificaciones de Delincuencia por Código Postal: Perspectivas sobre la seguridad de posibles ubicaciones de inversión.
+Resultados y Parámetros: Resultados del modelo centrados en número de baños, habitaciones, metros cuadrados, año y código postal.
+(5) Aumento Mediano del Alquiler Año tras Año (Código Postal 48220)
+
+(6) Valor Presente Neto (VPN): Un Relato de Perspectivas Basadas en Datos
+
+(7) Aplicación Mini Rmarkdown para Calcular la Tasa Interna de Retorno (TIR)

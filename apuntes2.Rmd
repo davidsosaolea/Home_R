@@ -96,13 +96,14 @@ Acompáñenos en este recorrido a través de un proceso automatizado que simplif
 
 ¡Comencemos!
 
-```{r, message=FALSE , warning=FALSE, rows.print = 5}
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
 # Cargar la biblioteca
 library(purrr)
 library(tidyverse)
 library(readr)
+```
 
-
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Configuración del directorio y archivos ZIP
 my_dir <- "01_Informacion_Data/US_Census_Bureau/"
 zip_files <- list.files(path = my_dir, pattern = "*.zip", full.names = TRUE)
@@ -184,7 +185,7 @@ En la sección inicial del código, se establecen las variables esenciales para 
 missing_zip_codescrime_zip <- c("48430", "48211", "48760", "48139", "48440")
 ```
 
-```{r, message=FALSE , warning=FALSE, rows.print = 5}
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
 # Cargar la biblioteca
 library(httr)
 library(jsonlite)
@@ -194,6 +195,9 @@ library(rvest)
 library(xml2)
 library(readxl)
 library(dplyr)
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Definir una función para importar datos utilizando la API
 data_import_IP <- function(url, API_Key, API_Host, request_delay) {
     
@@ -410,8 +414,10 @@ print(formatted_datetime)
 
 En R, la función **'filter'** se utiliza comúnmente para extraer filas específicas de un conjunto de datos basándose en condiciones específicas. Aquí tienes algunos ejemplos de cómo usar la función **'filter'**:
 
-```{r, message=FALSE , warning=FALSE, rows.print = 5}
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
 library(dplyr)
+```
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Crear un ejemplo de dataframe
 df <- data.frame(
   ID = c(1, 2, 3, 4, 5, 6),
@@ -453,8 +459,11 @@ result
 
 -   Filtrar valores faltantes
 
-```{r, message=FALSE , warning=FALSE, rows.print = 6}
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 6}
 library(naniar)
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 6}
 # Resumen de valores faltantes en el conjunto de datos filtrado
 miss_val_resumen <- df |>
   miss_case_summary()
@@ -467,11 +476,13 @@ miss_val_resumen
 
 La función **mutate()** es parte del paquete **dplyr** en R y se utiliza para realizar transformaciones en columnas existentes o agregar nuevas columnas a un conjunto de datos. Esta función es comúnmente utilizada en el contexto de manipulación y transformación de datos.
 
-```{r, message=FALSE , warning=FALSE, rows.print = 5}
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
 # Instala e carga las librerías necesarias si no las has instalado
 library(dplyr)
 library(lubridate)
+```
 
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Crear un conjunto de datos ficticio con una columna de fechas
 datos <- data.frame(
   Date_chr = c("2022-01-15", "2021-08-22", "2023-03-10")
@@ -500,8 +511,6 @@ df2 <- data.frame(
   ID = c(2, 3, 4, 5, 3, 4, 2),
   Ventas = c(2250, 5047, 5461, 7539, 2250, 5047, 5461)
 )
-
-
 
 ```
 
@@ -552,7 +561,7 @@ datos_seleccionados
 
 Los gráficos desempeñan un papel fundamental en el análisis de datos y la visualización de resultados en el ámbito de la programación estadística, y R se destaca como un lenguaje de programación especialmente poderoso para la creación de gráficos.
 
-```{r, message=FALSE , warning=FALSE, rows.print = 5}
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
 # Cargar bibliotecas necesarias
 library(readxl)
 library(tidyverse)
@@ -569,6 +578,9 @@ library(ggrepel)
 # Fuente de las funciones personalizadas
 source("06_funciones_y_interacion_iteration/Zillow_PC_Function.R")
 source("06_funciones_y_interacion_iteration/funciones_de_importacion.R")
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
 
 # Obtener datos de ciudades con la Tasa de Crecimiento Anual Compuesta (CAGR) para los años 2000 a 2022
 CAGR_Data <- getTopCitiesByCAGR(2000, 2022, 30)
@@ -1069,7 +1081,7 @@ Para aplicar el modelo LOWESS, se selecciona un parámetro llamado "ancho de ban
 
 LOWESS es útil en la exploración visual de datos para identificar tendencias o patrones subyacentes, especialmente cuando los datos muestran variabilidad significativa. Este método ha sido utilizado en diversas disciplinas, como estadísticas, econometría y ciencias sociales, para comprender mejor la relación entre variables y detectar tendencias locales en datos ruidosos.
 
-```{r, message=FALSE , warning=FALSE, rows.print = 5}
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
 # Carga de bibliotecas ----
 library(tidyverse)  # Paquete para manipulación y visualización de datos
 library(lubridate)  # Paquete para manipulación de fechas
@@ -1079,7 +1091,9 @@ library(scales)     # Paquete para escalas personalizadas en gráficos
 
 # Carga de la biblioteca ggplot2 si no está cargada
 library(ggplot2)
+```
 
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Establecer una semilla para reproducibilidad
 set.seed(13)
 
@@ -1131,10 +1145,13 @@ La importancia de gestionar valores atípicos radica en varios aspectos clave. E
 Además, los valores atípicos pueden influir significativamente en los modelos predictivos y algoritmos de aprendizaje automático. Si no se gestionan adecuadamente, pueden llevar a la creación de modelos ineficaces o poco precisos. Identificar y tratar estos valores atípicos permite mejorar la robustez y la generalización de los modelos, garantizando un rendimiento más confiable en datos nuevos.
 
 
-```{r, message=FALSE , warning=FALSE, rows.print = 5}
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
 # Data completa
 
 model_data <- read.csv("C:\\Users\\Usuario\\Documents\\R_class\\Analysis_&_Manipulation_De_Datos_En_Espanol\\01_Informacion_Data\\model_data.csv")
+```
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Data completa
 dim(model_data)
 
 ```
@@ -1224,6 +1241,9 @@ model3_no_outliers_robust_method |> glimpse()
 La comprobación de linealidad se refiere a la evaluación de la relación entre variables en un modelo estadístico o matemático para determinar si esta relación es lineal. En el contexto de análisis de regresión, la linealidad es una suposición fundamental. La comprobación de linealidad implica asegurarse de que la relación entre la variable dependiente y las variables independientes pueda ser bien aproximada mediante una línea recta.
 
 
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
+library(gridExtra)
+```
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Lista de variables a incluir en los gráficos de dispersión
 variables <- list("bathrooms", "bedrooms", "squareFootage", "zipCode")
@@ -1241,7 +1261,6 @@ create_scatter_plot_fun <- function(variables) {
 plots <- map(variables, create_scatter_plot_fun)
 
 # Organizar los gráficos en una cuadrícula
-library(gridExtra)
 grid.arrange(plots[[1]], plots[[2]], plots[[3]], plots[[4]], ncol = 2)
 
 ```
@@ -1286,10 +1305,13 @@ grid.arrange(plots[[1]], plots[[2]], plots[[3]], ncol = 2)
 Un Q-Q plot compara la distribución de los residuos con una distribución teórica (generalmente la distribución normal). Si los puntos del Q-Q plot siguen aproximadamente una línea diagonal, sugiere que los residuos se distribuyen de manera normal.
 
 
-```{r, message=FALSE , warning=FALSE, rows.print = 5}
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
 # Lista de modelos de regresión lineal ajustados a conjuntos de datos específicos
 library(ggpubr)
 library(cowplot)
+```
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Lista de modelos de regresión lineal ajustados a conjuntos de datos específicos
 models <- list(
   "model1_no_outliers_sd_method" = lm(price ~ bathrooms + bedrooms + squareFootage + zipCode, data = model1_no_outliers_sd_method),
   "model2_no_outliers_IQR_method" = lm(price ~ bathrooms + bedrooms + squareFootage + zipCode, data = model2_no_outliers_IQR_method),

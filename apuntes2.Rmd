@@ -1450,12 +1450,12 @@ La partición de datos es una técnica común en estadísticas y aprendizaje aut
 split_data_fun <- function(df, var1, var2) {
     
     # Obtener los niveles únicos de las variables var1 y var2
-    levels1 <- unique(df[[var1]])
-    levels2 <- unique(df[[var2]])
+    levels1 <- unique (df[[var1]])
+    levels2 <- unique (df[[var2]])
     
     # Inicializar índices para conjuntos de entrenamiento y prueba
     training_indices <- c()
-    testing_indices <- c()
+    testing_indices  <- c()
     
     # Iterar sobre los niveles de var1 y var2
     for (level1 in levels1) {
@@ -1465,7 +1465,7 @@ split_data_fun <- function(df, var1, var2) {
             rows <- which(df[[var1]] == level1 & df[[var2]] == level2)
             
             # Verificar si solo hay una instancia
-            if (length(rows) < 2) {
+            if (length(rows) < 2 ) {
                 # Si solo hay una instancia, añadirla a los datos de entrenamiento
                 training_indices <- c(training_indices, rows)
             } else {
@@ -1485,4 +1485,14 @@ split_data_fun <- function(df, var1, var2) {
 }
 
 ```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+
+split_data_frames <- map(data_sets, ~ split_data_fun(.x, "year", "zipCode" ))
+
+```
+
+
+
+
 

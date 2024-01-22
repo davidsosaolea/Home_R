@@ -367,3 +367,45 @@ create_parity_plot <- function(dataset, name){
 plots <- imap(datasets, ~ create_parity_plot(.x, .y))
 
 grid.arrange(grobs = plots, ncol = 3)
+
+# Valores Predichos
+
+calc_metrics <- function(dataset, model) {
+    
+    predictions <- predict(object = model, newdata = dataset)
+    actuals     <- dataset$price # Reemplazar 'price' con el nombre de la variable de respuesta
+    
+    metrics <- list()
+    
+    # Cacula tus metricas aqui, luego asignalas a lista
+    metrics$Model = deparse(substitute (model))
+    metrics$MAE   = mae (actual = actuals, predicted = predictions)
+    metrics$MSE   = mse (actual = actuals, predicted = predictions)
+    metrics$RMSE  = rmse(actual = actuals, predicted = predictions)
+    metrics$MAPE  = mape(actual = actuals, predicted = predictions) 
+    return(metrics)
+}
+
+results   <- map2(datasets, models, calc_metrics)
+
+metrics_df <-  do.call(rbind, lapply(results, as.data.frame))
+
+# Almacenando los Resultados
+
+model2_metrics <- metrics_df |> slice(2)
+
+# intervalos de confianza
+
+confint_df2  <-  as.data.frame(confint_model2)
+confint_df2  <- confint_df2 |> rownames_to_column("Term")
+m2_confint_tibble <- as_tibble(confint_df2)
+
+# resultados del modelo
+
+tidy_summary_model2  <- tidy(summary_model2)
+model2_f             <- left_join(tidy_summary_model2,
+                                  m2_confint_tibble, by = c("term" = "Term"))
+
+write_rds(x = model2_f, file = "01_Informacion_Data/Models_Data/model2_f")
+write_rds(x = tidy_summary_model2, file = "01_Informacion_Data/Models_Data/tidy_summary_model2")
+

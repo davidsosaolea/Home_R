@@ -194,6 +194,7 @@ library(fs)
 library(rvest)
 library(xml2)
 library(readxl)
+library(caret)
 library(dplyr)
 ```
 
@@ -574,6 +575,7 @@ library(ggplot2)
 library(plotly)
 library(tidyquant)
 library(ggrepel)
+library(purrr)
 
 # Fuente de las funciones personalizadas
 source("06_funciones_y_interacion_iteration/Zillow_PC_Function.R")
@@ -1149,6 +1151,9 @@ Además, los valores atípicos pueden influir significativamente en los modelos 
 # Data completa
 
 model_data <- read.csv("C:\\Users\\Usuario\\Documents\\R_class\\Analysis_&_Manipulation_De_Datos_En_Espanol\\01_Informacion_Data\\model_data.csv")
+library(DT)
+datatable(model_data, options = list(pageLength = 10), filter = "top")
+
 ```
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Data completa
@@ -1514,7 +1519,219 @@ split_data_frames <- map(data_sets, ~ split_data_fun(.x, "year", "zipCode" ))
 
 ```
 
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Modelo 1: Regresión Lineal Múltiple con Método de Separación de Datos
+# Se utiliza el método de separación de datos para dividir entre entrenamiento y prueba
+model <- lm(price ~ year
+            + bathrooms
+            + bedrooms
+            + squareFootage * zipCode,
+            data = split_data_frames$model1_no_outliers_sd_method$training) 
+
+# Modelo 2: Regresión Lineal Múltiple con Método de Separación de Datos (IQR)
+# Se utiliza el método de separación de datos con el método IQR para manejar valores atípicos
+model2 <- lm(price ~ year
+              + bathrooms
+              + bedrooms
+              + squareFootage * zipCode,
+              data = split_data_frames$model2_no_outliers_IQR_method$training)
+
+# Modelo 3: Regresión Lineal Múltiple con Método de Separación de Datos (Robusto)
+# Se utiliza el método de separación de datos con el método robusto para manejar valores atípicos
+model3 <- lm(price ~ year
+              + bathrooms
+              + bedrooms
+              + squareFootage * zipCode,
+              data = split_data_frames$model3_no_outliers_robust_method$training)
+```
 
 
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Obtener resúmenes y estadísticas adicionales para los modelos
+
+# Resumen del Modelo 1
+summary_model  <- summary(model)
+
+# Resumen del Modelo 2
+summary_model2 <- summary(model2)
+
+# Resumen del Modelo 3
+summary_model3 <- summary(model3)
+
+# Estadísticas adicionales del Modelo 1
+glance_model  <- broom::glance(model)
+
+# Estadísticas adicionales del Modelo 2
+glance_model2 <- broom::glance(model2)
+
+# Estadísticas adicionales del Modelo 3
+glance_model3 <- broom::glance(model3)
+```
+
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
+print(summary_model)
+```
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
+glance_model2
+```
+
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Obtener intervalos de confianza para los coeficientes de los modelos
+
+# Intervalos de confianza del Modelo 1
+confint_model  <- confint(model, level = 0.95)
+
+# Intervalos de confianza del Modelo 2
+confint_model2 <- confint(model2, level = 0.95)
+
+# Intervalos de confianza del Modelo 3
+confint_model3 <- confint(model3, level = 0.95)
+
+```
+
+
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
+# Conjunto de datos de prueba para el Modelo 1
+m1 <- split_data_frames$model1_no_outliers_sd_method$testing
+
+# Conjunto de datos de prueba para el Modelo 2
+m2 <- split_data_frames$model2_no_outliers_IQR_method$testing 
+
+# Conjunto de datos de prueba para el Modelo 3
+m3 <- split_data_frames$model3_no_outliers_rubust_method$testing
+
+# Crear una lista para los modelos
+models <- list(model = model, model2 = model2, model3 = model3)
+
+
+class(m3)
+```
+
+
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
+# # Crear una lista para el conjunto de prueba
+# datasets <- list(m1 = m1, m2 = m2, m3 = m3)
+# 
+# # Función para añadir predicciones a los datos
+# add_predictions <- function(dataset, model) {
+#     dataset$predicted <- predict(object = model, newdata = dataset)
+#     dataset
+# }
+# 
+# # Aplicar la función a cada combinación de conjunto de datos y modelo
+# datasets <- mapply(add_predictions, datasets, models, SIMPLIFY = FALSE)
+# 
+# # Función para crear 3 gráficos de paridad
+# create_parity_plot <- function(dataset, name){
+#     
+#     ggplot(dataset, aes(x = price, y = predicted)) +
+#         geom_point() +
+#         geom_abline(color = "red", linetype = "dashed") +
+#         labs(
+#             x = "Precio Observado",
+#             y = "Precio Predicho",
+#             title = paste("Gráfico de Paridad: Precio Observado vs Predicho (", name, ")"),
+#             theme_minimal()
+#         )
+# }
+# 
+# # Aplicar la función de creación de gráficos a cada conjunto de datos
+# plots <- imap(datasets, ~ create_parity_plot(.x, .y))
+# 
+# # Organizar los gráficos en una cuadrícula
+# grid.arrange(grobs = plots, ncol = 3)
+```
+```{r}
+# Crear una lista para el conjunto de prueba
+datasets <- list(m1 = m1, m2 = m2, m3 = m3)
+
+# Función para añadir predicciones a los datos
+add_predictions <- function(dataset, model) {
+    dataset$predicted <- predict(object = model, newdata = dataset)
+    dataset
+}
+
+# Aplicar la función a cada combinación de conjunto de datos y modelo
+datasets <- mapply(add_predictions, datasets, models, SIMPLIFY = FALSE)
+
+# Función para crear gráficos de paridad
+create_parity_plot <- function(dataset, name){
+    ggplot(dataset, aes(x = price, y = predicted)) +
+        geom_point() +
+        geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
+        labs(
+            x = "Precio Observado",
+            y = "Precio Predicho",
+            title = paste("Gráfico de Paridad: Precio Observado vs Predicho (", name, ")")
+        ) +
+        theme_minimal()
+}
+
+# Aplicar la función de creación de gráficos a cada conjunto de datos
+plots <- imap(datasets, ~ create_parity_plot(.x, .y))
+
+# Imprimir o visualizar los gráficos individualmente para verificar si alguno causa el error
+
+# Organizar los gráficos en una cuadrícula
+grid.arrange(grobs = plots, ncol = 3)
+
+```
+
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Valores Predichos
+
+calc_metrics <- function(dataset, model) {
+    
+    predictions <- predict(object = model, newdata = dataset)
+    actuals     <- dataset$price # Reemplazar 'price' con el nombre de la variable de respuesta
+    
+    metrics <- list()
+    
+    # Cacula tus metricas aqui, luego asignalas a lista
+    metrics$Model = deparse(substitute (model))
+    metrics$MAE   = mae (actual = actuals, predicted = predictions)
+    metrics$MSE   = mse (actual = actuals, predicted = predictions)
+    metrics$RMSE  = rmse(actual = actuals, predicted = predictions)
+    metrics$MAPE  = mape(actual = actuals, predicted = predictions) 
+    return(metrics)
+}
+
+results   <- map2(datasets, models, calc_metrics)
+
+metrics_df <-  do.call(rbind, lapply(results, as.data.frame))
+```
+
+
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
+print(results )
+```
+
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
+print(metrics_df)
+```
+
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Almacenando los Resultados
+
+model2_metrics <- metrics_df |> slice(2)
+
+# intervalos de confianza
+
+confint_df2  <-  as.data.frame(confint_model2)
+confint_df2  <- confint_df2 |> rownames_to_column("Term")
+m2_confint_tibble <- as_tibble(confint_df2)
+
+# resultados del modelo
+
+tidy_summary_model2  <- tidy(summary_model2)
+model2_f             <- left_join(tidy_summary_model2,
+                                  m2_confint_tibble, by = c("term" = "Term"))
+
+write_rds(x = model2_f, file = "01_Informacion_Data/Models_Data/model2_f")
+write_rds(x = tidy_summary_model2, file = "01_Informacion_Data/Models_Data/tidy_summary_model2")
+```
 
 

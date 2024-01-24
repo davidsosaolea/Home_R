@@ -1,0 +1,218 @@
+---
+title: "Análisis de Zonas de Alquiler"
+author: "BIDDSA"
+date: "2024-01-14"
+output: 
+    html_document:
+    css: styles.css
+runtime : shiny
+---
+    
+    ```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(gt)
+library(dplyr)
+library(readr)
+library(tidyverse)
+library(scales)
+library(plotly)
+library(glue)
+library(naniar)
+```
+
+<style>
+    .sticky-title {
+        position: sticky;
+        top: 0;
+        background-color: white;
+        padding: 5px;
+        border-bottom: 2px solid #ddd;
+        z-index: 1000;
+    }
+</style>
+    
+<div class = "sticky-title">
+### Background
+</div>
+    
+Este informe fue uno de los reportes escritos que creé para uno de mis clientes, David, y me gustaría presentarlo aquí. Creo que el análisis de datos puede ayudar a tomar mejores decisiones financieras no solo para usted, sino también para otros. David, como muchos otros, anhelaba una manera inteligente de invertir su dinero. Pensó en invertir en una propiedad de alquiler para diversificar su efectivo. Pero había un problema: no sabía por dónde empezar. El sector inmobiliario parecía complicado y se sentía perdido con todas las opciones. No puedo compartir sus datos financieros aquí, pero demostraré un segmento del análisis sobre cómo utilicé datos públicos para crear un plan de recomendación para que invirtiera en su primera propiedad de alquiler. Espero que lo disfruten
+
+
+<style>
+    .sticky-title {
+        position: sticky;
+        top: 0;
+        background-color: white;
+        padding: 5px;
+        border-bottom: 2px solid #ddd;
+        z-index: 1000;
+    }
+</style>
+
+<div class = "sticky-title">
+### Puntos de Conversación
+</div>
+    
+- **(1) Enfocándose en Zonas de Alto Alquiler en Detroit Metropolitano Basado en Precios de Alquiler de 2019 a 2023.**
+    + **Enfoque y Lógica del Análisis**
+    + **Demografía de Alto Alquiler:** Entendiendo el tipo de personas atraídas por áreas de alto alquiler.
+    + **Implicaciones de Marketing:** Cómo estas demografías influyen en el marketing.
+    + **Tabulación:** Tabla que muestra ciudades y códigos postales que cumplen con los criterios.
+    + **Estrategia de Agrupación:** Cómo la segmentación de unidades puede ayudar en la selección de códigos postales.
+    + **Áreas de Enfoque:** Ubicación Ubicación Ubicación
+<br><br>
+
+- **(2) Implicaciones Financieras**
+    + **Valor y Ganancias:** Discusión sobre el valor de las propiedades y las ganancias de capital esperadas.
+    + **Riesgos y Tasas:** Perspectivas sobre tasas de vacancia y morosidad en áreas de alto alquiler.
+    + **Compensaciones Financieras:** Resaltando los riesgos financieros en áreas de alto alquiler.
+<br><br>
+
+- **(3) Perspectivas de Datos a través de la Visualización**
+    + **Diagrama de Caja:** Representación gráfica simple de la distribución de un conjunto de datos.
+    + **Agrupación en Diagramas de Caja:** Presentar datos con diferentes escalas puede ayudar a contar una historia más matizada.
+    + **Agrupación en un Solo Diagrama de Caja:** Ayuda a realizar comparaciones visuales directas entre las distribuciones de precios de alquiler de cada año.
+<br><br>
+
+- **(4) Modelización y Predicción**
+    + **Metodología: **Uso del Modelo de Regresión Lineal para la estimación de alquileres.
+    + **Calificaciones de Delincuencia por Código Postal:** Perspectivas sobre la seguridad de posibles ubicaciones de inversión.
+    + **Resultados y Parámetros:** Resultados del modelo centrados en número de baños, habitaciones, metros cuadrados, año y código postal.
+<br><br>
+- **(5) Aumento Mediano del Alquiler Año tras Año (Código Postal 48220)**
+
+- **(6) Valor Presente Neto (VPN): Un Relato de Perspectivas Basadas en Datos**
+
+- **(7) Aplicación Mini Rmarkdown para Calcular la Tasa Interna de Retorno (TIR)**
+<br>
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+# data setup
+#getwd()
+filList_response <- read_rds(file = "C:/Users/willi/OneDrive/PROJECTS/Class_Projects/Analysis_&_Manipulation_De_Datos_En_Espanol/01_Informacion_Data/Rental_Listing_Data/Rental_Listings.RDS")
+
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+combined_df <- filList_response |>
+    bind_rows(.id = "source")
+
+# gg_miss_var(combined_df)
+
+
+price_quantiles <- combined_df |>
+    summarise(q1 = quantile(price, 0.25, na.rm = TRUE),
+              q2 = quantile(price, 0.5 , na.rm = TRUE),
+              q3 = quantile(price, 0.75, na.rm = TRUE))
+
+combined_df <- combined_df |>
+    mutate(price_group = case_when(
+        
+        price <= price_quantiles$q1 ~ "group1",
+        price > price_quantiles$q1 & price <= price_quantiles$q2 ~ "group2",
+        price > price_quantiles$q2 & price <= price_quantiles$q3 ~ "group3",
+        price > price_quantiles$q3 ~ "group4",
+        TRUE ~ NA_character_
+        
+    ))
+
+price_group_counts <- combined_df |>
+    group_by(city, zipCode, price_group) |>
+    summarise(count = n(), .groups = "drop")
+
+price_group_counts_wide <- price_group_counts |>
+    pivot_wider(names_from = price_group, values_from = count) |>
+    select(city, zipCode, group1, group2, group3, group4)
+
+rm(price_group_counts)
+
+```
+
+
+
+```{r, echo=FALSE, message=FALSE}
+
+price_group_counts_wide[is.na(price_group_counts_wide)] <- 0
+
+q1 <- price_quantiles$q1 %>% scales::dollar()
+q2 <- price_quantiles$q2 %>% scales::dollar()
+q3 <- price_quantiles$q3 %>% scales::dollar()
+
+
+
+```
+
+<style>
+.sticky-title {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    padding: 5px;
+    border-bottom: 2px solid #ddd;
+    z-index: 1000;
+}
+</style>
+
+<div class="sticky-title">
+### (1) Enfocándose en Zonas de Alto Alquiler.
+</div>
+
+__NOTA:__ Antes de comenzar, es importante recordar que hay varias maneras de analizar estos datos. Nuestro objetivo es simplificar el proceso y enfocarnos más en las diferentes herramientas que estamos utilizando aquí para crear un análisis y compartir los hallazgos.
+
+¡Vamos a sumergirnos! La lógica en esta primera sección es simple: los datos contienen precios de alquiler entre 2019 y 2023. Si ciertos códigos postales mostraron consistentemente alquileres más altos, podrían ser áreas prometedoras para inversiones inmobiliarias. Las áreas de alquiler alto parecen atraer a ciertos demográficos, como profesionales con altos ingresos. Esto podría influir en cómo se puede comercializar la unidad en el futuro. Por lo tanto, agruparemos las unidades juntas basándonos en sus cuantiles de precio de alquiler de la siguiente manera:
+
+
+- __Group1__ tiene todas las unidades en los datos que se alquilan por debajo de  __`r q1`__ en el conjunto de datos<br>
+- __Group2__ tiene todas las unidades que se alquilan por más de __`r q1`__ y por menos de  __`r q2`__ en el conjunto de datos<br>
+- __Group3__ tiene todas las unidades que se alquilan por más de __`r q2`__ y por menos de  __`r q3`__ en el conjunto de datos<br>
+- __Group4__ tiene todas las unidades que se alquilan por más de __`r q3`__ en el conjunto de datos
+ 
+Centraremos nuestra atención en los códigos postales de **Group3 & Group4** para este análisis. Suponiendo que un número significativo de unidades en Group3  podría potencialmente transicionar a  Group4 en el futuro, especialmente en áreas que demuestran tendencias de crecimiento, vale la pena considerar que estas zonas de alquiler alto podrían también coincidir con valores de propiedad en apreciación, ofreciendo el potencial de ganancias de capital favorables a lo largo del tiempo.
+
+Identifiquemos áreas donde la mayoría de las unidades alquiladas pertenecen a Grupo3 y Grupo4 filtrando los grupos en la tabla de abajo que cumplan con los siguientes criterios.
+
+ - Para Group3, más de 200 unidades
+ - Para Group4, más de 100 unidades
+
+**INFO:** *Haz clic en la celda que dice __'All'__ en la tabla para filtrar los datos.* 
+
+```{r, echo=FALSE, message=FALSE,  warning=FALSE}
+library(DT)
+datatable(price_group_counts_wide, options = list(pageLength = 10), filter = "top")
+```
+
+<style>
+.sticky-title {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    padding: 5px;
+    border-bottom: 2px solid #ddd;
+    z-index: 1000;
+}
+</style>
+
+<div class="sticky-title">
+### (2) Implicaciones Financieras
+</div>
+
+**Agrupar el número de unidades en diferentes cubos/cuantiles basados en su precio de alquiler por __ZipCodes__ puede ayudar a responder preguntas como ¿Qué códigos postales tienen el mayor número de unidades en el grupoX? A continuación, presento una guía general sobre cómo estos datos pueden ayudar:** 
+
+
+__Where to Invest?:__ Si ciertos códigos postales demuestran consistentemente alquileres más altos, podrían ser un buen lugar para inversiones inmobiliarias, asumiendo que los precios de las propiedades y los costos operativos permitan un flujo de efectivo positivo y un retorno de la inversión.
+
+__Property Value Appreciation:__ Los códigos postales de alquiler alto también podrían ser áreas donde los valores de las propiedades están aumentando, lo que podría llevar a ganancias de capital a lo largo del tiempo.
+
+__Understanding Market Trends:__ Mirar áreas con alquileres altos puede ayudar a identificar barrios populares o en ascenso. Si una zona previamente de alquiler bajo comienza a mostrar alquileres crecientes, podría ser un mercado emergente con potencial de inversión.
+
+__Tenant Demographics:__  Las áreas de alquiler alto podrían atraer a ciertas demografías (por ejemplo, profesionales con altos ingresos) que pueden ser deseables para los propietarios. Entender estas demografías podría influir en el tipo de propiedades en las que inviertes y cómo las comercializas.
+
+__Rent Pricing Strategy:__ Conocer las áreas con alquileres más altos puede proporcionar puntos de referencia al establecer precios de alquiler para tus propias propiedades, ayudando a maximizar los ingresos.
+
+__Risk Assessment:__ Las áreas de alquiler alto también pueden correlacionarse con factores como tasas de vacancia más bajas o tasas de incumplimiento más bajas, lo que puede disminuir el riesgo de inversión. Sin embargo, también podrían estar asociadas con precios de propiedad más altos, lo que puede aumentar el riesgo financiero. Entender estos equilibrios es importante para una estrategia de inversión.
+
+__NOTA:__ Recuerda que los alquileres altos son solo un factor a considerar en la inversión inmobiliaria. Otros factores como el precio de la propiedad, los costos operativos, las implicaciones fiscales, las regulaciones locales, el potencial de crecimiento del mercado, etc., también deben ser tenidos en cuenta. Además, los datos para calcular los cuantiles anteriores son entre 2019 y 2023, pero también podrías filtrar los datos en un año específico. Finalmente, el tamaño de los códigos postales puede variar ampliamente en términos de millas cuadradas. Algunos códigos postales cubren solo una pequeña área urbana, mientras que otros pueden abarcar regiones suburbanas o rurales más grandes
+
+
+
+

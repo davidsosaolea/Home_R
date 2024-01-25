@@ -33,6 +33,7 @@ La importación de datos es un proceso crucial en cualquier análisis de datos, 
 # Especificar la ruta del archivo Excel
 ruta_archivo <- "01_Informacion_Data/Bureau_Labor_of_Statistics_Data/Detroit_Warren_Dearborn.xlsx"
 
+
 ```
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
@@ -173,7 +174,7 @@ Este código en R se desarrolló con el propósito de importar datos mediante un
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Configurar la URL y claves de la API
 url <- "https://us-zip-code-to-income.p.rapidapi.com/"
-API_Key <- "f7eec58e6cmsh805b1f341c11ff4p18a6b6jsn441ba456adeb" #uwu xd#
+API_Key <- "3ae1342808msh73894b2e7f34016p1c7b91jsnde2c83fb994a" #uwu xd#
 API_Host <- "us-zip-code-to-income.p.rapidapi.com"
 request_delay <- 2 # Definir el retardo entre las solicitudes (en segundos)
 ```
@@ -418,6 +419,7 @@ En R, la función **'filter'** se utiliza comúnmente para extraer filas especí
 ```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
 library(dplyr)
 ```
+
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Crear un ejemplo de dataframe
 df <- data.frame(
@@ -707,6 +709,7 @@ g_plotly
 ```
 
 ## Precios de Viviendas vs Empleo
+
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 
 # Importar datos relevantes para el Plot 3
@@ -778,8 +781,8 @@ p3 + theme (
     
 ```
 
-
 ## Regresión LOESS
+
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 
 ## (LOESS) Local Polynomial Regression
@@ -830,7 +833,6 @@ p4 + annotate(geom = "curve",
 
 ```
 
-
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 
 ## LOESS & ggplotly
@@ -863,7 +865,6 @@ p4 |>
     ggplotly(tooltip = "text")
 
 ```
-
 
 ## Explorando Mercados Inmobiliarios: Usando Geom_Bar
 
@@ -945,7 +946,6 @@ p5 |> ggplotly(tooltip = "text") |>
 
 ```
 
-
 ## Representación Gráfica del Ingreso Medio Familiar
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
@@ -964,7 +964,6 @@ demographics_CAGR <-  CAGR_Data_zip |> left_join(demographics, by = "zip")
 # Visualizar la estructura de datos
 demographics_CAGR |> glimpse()
 ```
-
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Agregar una columna de texto para etiquetas
@@ -1008,10 +1007,9 @@ g_plotly <- g_plotly %>%
 g_plotly
 ```
 
-
 ## Gráfico de Pareto Clásico
 
-El Gráfico de Pareto es una herramienta visual poderosa utilizada en gestión y mejora de procesos para identificar y priorizar problemas o causas, centrándose en aquellos que tienen el mayor impacto. Su nombre proviene del principio de Pareto, que sugiere que aproximadamente el 80% de los problemas provienen del 20% de las causas. 
+El Gráfico de Pareto es una herramienta visual poderosa utilizada en gestión y mejora de procesos para identificar y priorizar problemas o causas, centrándose en aquellos que tienen el mayor impacto. Su nombre proviene del principio de Pareto, que sugiere que aproximadamente el 80% de los problemas provienen del 20% de las causas.
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Data Preparation
@@ -1139,27 +1137,60 @@ FP |> ggplotly()
 
 ```
 
-
 # Manejar Valores atípicos
 
 La importancia de gestionar valores atípicos radica en varios aspectos clave. En primer lugar, estos valores pueden distorsionar las medidas estadísticas comunes, como la media y la desviación estándar, generando estimaciones sesgadas y poco representativas de la realidad. Al abordar los valores atípicos, se obtiene una visión más precisa y equilibrada de la distribución de los datos.
 
 Además, los valores atípicos pueden influir significativamente en los modelos predictivos y algoritmos de aprendizaje automático. Si no se gestionan adecuadamente, pueden llevar a la creación de modelos ineficaces o poco precisos. Identificar y tratar estos valores atípicos permite mejorar la robustez y la generalización de los modelos, garantizando un rendimiento más confiable en datos nuevos.
 
-
 ```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
-# Data completa
+# Cargar librerías requeridas
+library(ggplot2)   # visualización de datos
+library(caret)     # tareas de aprendizaje automático
+library(tidyverse) # manipulación y visualización de datos
+library(naniar)    # para entender los valores faltantes
+library(purrr)     # para iteraciones
+library(rlang)     # ayuda a convertir un string en un símbolo
+library(lubridate) # ayuda a manejar datos de fechas
+library(gridExtra) # ayuda con la visualización
+library(ggpubr)    # mejora las visualizaciones de gráficos de ggplot2
+library(patchwork) # ayuda a combinar varios gráficos de ggplot2 en un gráfico compuesto
+library(broom)     # ayuda con el ordenamiento de objetos de modelos
+library(Metrics)
+library(plotly)
 
-model_data <- read.csv("C:\\Users\\Usuario\\Documents\\R_class\\Analysis_&_Manipulation_De_Datos_En_Espanol\\01_Informacion_Data\\model_data.csv")
-library(DT)
-datatable(model_data, options = list(pageLength = 10), filter = "top")
+#setwd("R_class/Analysis_&_Manipulation_De_Datos_En_Espanol/")
+
+#Cargar los datos de listados de alquileres
+rent_data <- read_rds(file = "01_Informacion_Data/Rental_Listing_Data/Rental_Listings.RDS")
+
+# Combinar datos de todos los codigos postales en un unico dataframe
+# El argumento id se utiliza para crear una nueva columna que registra el origen de cada fila.
+
+rent_data_unlist <- rent_data |>
+    bind_rows(.id = "source")
+
+# Preparar los Datos de los modelos
+# Filtrar los datos para incluir solo los códigos postales especificados para el análisis #c("48237", "48069","48067", "48017", "48072", "48220","48030","48221", "48203")
+
+model_data <- rent_data_unlist |>
+    mutate (dates = ymd_hms (lastSeen),
+            year = format(dates, "%Y")) |>
+    select(year, zipCode, price, bathrooms, bedrooms, squareFootage) |>
+    filter (zipCode %in% c("48237", "48069", "48067", "48017", "48072", "48220", "48030", "48221", "48203"))
 
 ```
+
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Data completa
 dim(model_data)
 
 ```
+```{r,echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
+model_data <- model_data |> na.omit()
+
+```
+
 ## Identificar valores atípicos utilizando la desviación estándar (SD)
 
 Eliminar valores atípicos utilizando la desviación estándar (SD) es un enfoque común en estadística para identificar y tratar puntos de datos que se desvían significativamente de la media de un conjunto de datos. El método implica calcular la desviación estándar de los datos y eliminar los valores que están a una cierta distancia (múltiplos de la desviación estándar) de la media.
@@ -1168,18 +1199,13 @@ Aquí hay una descripción básica de cómo funciona este método:
 
 Calcular la Media y la Desviación Estándar:
 
-Se calcula la media (promedio) y la desviación estándar de los datos.
-Establecer un Umbral:
+Se calcula la media (promedio) y la desviación estándar de los datos. Establecer un Umbral:
 
-Se elige un múltiplo de la desviación estándar como umbral. Comúnmente, se utilizan múltiplos como 1, 1.5, 2, o 3, dependiendo de la rigurosidad que se desee aplicar.
-Identificar y Eliminar Valores Atípicos:
+Se elige un múltiplo de la desviación estándar como umbral. Comúnmente, se utilizan múltiplos como 1, 1.5, 2, o 3, dependiendo de la rigurosidad que se desee aplicar. Identificar y Eliminar Valores Atípicos:
 
-Se identifican los valores que están más allá del umbral establecido en ambos extremos de la distribución (por encima y por debajo de la media).
-Estos valores se consideran atípicos y se eliminan del conjunto de datos.
-Revisar y Validar:
+Se identifican los valores que están más allá del umbral establecido en ambos extremos de la distribución (por encima y por debajo de la media). Estos valores se consideran atípicos y se eliminan del conjunto de datos. Revisar y Validar:
 
-Después de eliminar los valores atípicos, es importante revisar el conjunto de datos resultante y considerar si la exclusión de esos valores es justificada. En algunos casos, los valores atípicos pueden contener información importante o representar eventos genuinos.
-Es importante destacar que este método asume que los datos siguen una distribución normal. 
+Después de eliminar los valores atípicos, es importante revisar el conjunto de datos resultante y considerar si la exclusión de esos valores es justificada. En algunos casos, los valores atípicos pueden contener información importante o representar eventos genuinos. Es importante destacar que este método asume que los datos siguen una distribución normal.
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Calcular la media y la desviación estándar de la columna 'price' en el DataFrame 'model_data'
@@ -1196,9 +1222,12 @@ model1_no_outliers_sd_method <- model_data[!outliers, ]
 model1_no_outliers_sd_method |> glimpse()
 
 ```
+
 ## Eliminar valores atipicos con el metodo IQR
 
-Eliminar valores atípicos con el método IQR (rango intercuartílico) es otra técnica común en estadística. El rango intercuartílico es la diferencia entre el tercer cuartil (Q3) y el primer cuartil (Q1) de un conjunto de datos. Los valores atípicos se identifican y eliminan si están por debajo de Q1 - 1.5 * IQR o por encima de Q3 + 1.5 * IQR. Aquí hay un ejemplo de cómo implementar esto en R:
+Eliminar valores atípicos con el método IQR (rango intercuartílico) es otra técnica común en estadística. El rango intercuartílico es la diferencia entre el tercer cuartil (Q3) y el primer cuartil (Q1) de un conjunto de datos. Los valores atípicos se identifican y eliminan si están por debajo de Q1 - 1.5 \* IQR o por encima de Q3 + 1.5 \* IQR. Aquí hay un ejemplo de cómo implementar esto en R:
+
+
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Calcular el primer cuartil (Q1)
@@ -1221,7 +1250,6 @@ glimpse(model2_no_outliers_IQR_method)
 
 ```
 
-
 ## Usar método Robustos
 
 El Método de Desviación Absoluta de la Mediana (Median Absolute Deviation, MAD) es un enfoque robusto utilizado para identificar valores atípicos en un conjunto de datos. A diferencia de otros métodos que dependen de la media y la desviación estándar, el MAD utiliza la mediana como medida central y evalúa la dispersión de los datos en términos de desviaciones absolutas respecto a la mediana.
@@ -1241,14 +1269,14 @@ model3_no_outliers_robust_method |> glimpse()
 
 ```
 
-# Comprobación de linealidad 
+# Comprobación de linealidad
 
 La comprobación de linealidad se refiere a la evaluación de la relación entre variables en un modelo estadístico o matemático para determinar si esta relación es lineal. En el contexto de análisis de regresión, la linealidad es una suposición fundamental. La comprobación de linealidad implica asegurarse de que la relación entre la variable dependiente y las variables independientes pueda ser bien aproximada mediante una línea recta.
-
 
 ```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
 library(gridExtra)
 ```
+
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Lista de variables a incluir en los gráficos de dispersión
 variables <- list("bathrooms", "bedrooms", "squareFootage", "zipCode")
@@ -1269,16 +1297,17 @@ plots <- map(variables, create_scatter_plot_fun)
 grid.arrange(plots[[1]], plots[[2]], plots[[3]], plots[[4]], ncol = 2)
 
 ```
-#  Gráficos de Residuos
+
+# Gráficos de Residuos
 
 Los gráficos de residuos son herramientas visuales utilizadas en el análisis de regresión para evaluar la calidad del ajuste de un modelo a los datos observados. Los residuos son las diferencias entre los valores observados y los valores predichos por el modelo. Al examinar los patrones y distribuciones de estos residuos, se pueden identificar posibles violaciones de las suposiciones del modelo de regresión.
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Lista de conjuntos de datos que contienen modelos sin valores atípicos
 data_sets <- list(
-  "model1_no_outliers_sd_method" = model1_no_outliers_sd_method,
-  "model2_no_outliers_IQR_method" = model2_no_outliers_IQR_method,
-  "model3_no_outliers_robust_method" = model3_no_outliers_robust_method
+    "model1_no_outliers_sd_method" = model1_no_outliers_sd_method,
+    "model2_no_outliers_IQR_method" = model2_no_outliers_IQR_method,
+    "model3_no_outliers_robust_method" = model3_no_outliers_robust_method
 )
 
 # Fórmula del modelo de regresión lineal
@@ -1305,16 +1334,17 @@ plots <- map2(models, names(models), create_residuals_plot_fun)
 grid.arrange(plots[[1]], plots[[2]], plots[[3]], ncol = 2)
 
 ```
+
 ## Normal Q - Q
 
 Un Q-Q plot compara la distribución de los residuos con una distribución teórica (generalmente la distribución normal). Si los puntos del Q-Q plot siguen aproximadamente una línea diagonal, sugiere que los residuos se distribuyen de manera normal.
-
 
 ```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
 # Lista de modelos de regresión lineal ajustados a conjuntos de datos específicos
 library(ggpubr)
 library(cowplot)
 ```
+
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Lista de modelos de regresión lineal ajustados a conjuntos de datos específicos
 models <- list(
@@ -1340,17 +1370,17 @@ print(combined_plot)
 
 ```
 
-# Coeficiente de correlación 
+# Coeficiente de correlación
 
 El coeficiente de correlación es una medida estadística que cuantifica la relación lineal entre dos variables. En otras palabras, el coeficiente de correlación indica en qué medida las variaciones en una variable están asociadas con las variaciones en otra variable. Esta medida se utiliza comúnmente para evaluar la fuerza y dirección de la relación entre dos variables continuas.
 
 Existen diferentes tipos de coeficientes de correlación, pero uno de los más comunes es el coeficiente de correlación de Pearson. El coeficiente de correlación de Pearson, denotado como "r", tiene un rango de -1 a 1, donde:
 
-* 1: Indica una correlación perfecta positiva. Esto significa que a medida que una variable aumenta, la otra variable también aumenta en una relación lineal perfecta.
+-   1: Indica una correlación perfecta positiva. Esto significa que a medida que una variable aumenta, la otra variable también aumenta en una relación lineal perfecta.
 
-* 0: Indica ausencia de correlación lineal. No hay relación lineal entre las dos variables.
+-   0: Indica ausencia de correlación lineal. No hay relación lineal entre las dos variables.
 
-* -1: Indica una correlación perfecta negativa. Esto significa que a medida que una variable aumenta, la otra variable disminuye en una relación lineal perfecta.
+-   -1: Indica una correlación perfecta negativa. Esto significa que a medida que una variable aumenta, la otra variable disminuye en una relación lineal perfecta.
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Calcular el coeficiente de correlación entre price y bathrooms
@@ -1371,31 +1401,29 @@ print(paste("Coeficiente de correlación entre price y squareFootage:", cor_squa
 
 Las transformaciones de datos, como tomar el logaritmo, la raíz cuadrada o elevar al cuadrado, son técnicas utilizadas en el análisis de datos por diversas razones. El propósito principal de estas transformaciones es modificar la distribución de los datos o la relación entre las variables para satisfacer las suposiciones de los métodos estadísticos o mejorar la interpretabilidad de los resultados. Aquí hay algunas razones comunes para realizar transformaciones:
 
-* **Estabilizar la Varianza:**
+-   **Estabilizar la Varianza:**
 
 En el análisis de regresión, se asume que la varianza de los errores es constante en todos los niveles de las variables predictoras. Si hay una relación no constante entre la varianza y las variables predictoras, las transformaciones como la raíz cuadrada o el logaritmo pueden ayudar a estabilizar la varianza.
 
-* **Linearizar Relaciones No Lineales:**
+-   **Linearizar Relaciones No Lineales:**
 
 En algunos casos, la relación entre las variables puede ser no lineal, pero los modelos estadísticos asumen una relación lineal. Tomar el logaritmo o la raíz cuadrada de una variable puede ayudar a linealizar la relación, permitiendo así que se apliquen modelos lineales.
 
-* **Manejar Sesgo en la Distribución:**
+-   **Manejar Sesgo en la Distribución:**
 
 Si los datos tienen una distribución sesgada hacia la derecha, donde hay valores atípicos que se encuentran en el extremo superior, tomar el logaritmo puede reducir el sesgo y hacer que la distribución sea más simétrica.
 
-* **Escalamiento:**
+-   **Escalamiento:**
 
 Elevar al cuadrado o tomar la raíz cuadrada de una variable puede cambiar la escala de los datos, lo que puede ser útil para resaltar patrones o reducir la importancia de valores extremos.
 
-* **Condiciones de Normalidad:**
+-   **Condiciones de Normalidad:**
 
 En algunos métodos estadísticos, como las pruebas de hipótesis paramétricas, se asume la normalidad de los datos. Transformaciones como el logaritmo pueden ayudar a que los datos se aproximen más a una distribución normal.
 
-* **Mejorar la Interpretabilidad:**
+-   **Mejorar la Interpretabilidad:**
 
-En ocasiones, realizar transformaciones puede hacer que los resultados sean más interpretables o más fácilmente comparables.
-Es importante señalar que la elección de una transformación específica depende de la naturaleza de los datos y de los objetivos del análisis. Además, se debe tener precaución al interpretar resultados transformados, ya que pueden afectar la interpretación de los coeficientes o las métricas de evaluación del modelo. La selección de una transformación adecuada a menudo implica explorar y comprender la naturaleza de los datos.
-
+En ocasiones, realizar transformaciones puede hacer que los resultados sean más interpretables o más fácilmente comparables. Es importante señalar que la elección de una transformación específica depende de la naturaleza de los datos y de los objetivos del análisis. Además, se debe tener precaución al interpretar resultados transformados, ya que pueden afectar la interpretación de los coeficientes o las métricas de evaluación del modelo. La selección de una transformación adecuada a menudo implica explorar y comprender la naturaleza de los datos.
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Crear un nuevo DataFrame con la transformación logarítmica de squareFootage
@@ -1450,7 +1478,6 @@ La función básica para convertir una variable a factor en R es **'as.factor()'
 map(data_sets, str)
 ```
 
-
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 
 # Definir una función para convertir a factores ciertas columnas en un conjunto de datos
@@ -1470,7 +1497,6 @@ map(data_sets, str)
 # Partición de Datos
 
 La partición de datos es una técnica común en estadísticas y aprendizaje automático que implica dividir un conjunto de datos en subconjuntos más pequeños para diversos propósitos, como entrenar modelos, validar modelos y evaluar su rendimiento. Las particiones de datos son fundamentales para garantizar la validez y la generalización de los modelos que se construyen.
-
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Definir una función para dividir los datos en conjuntos de entrenamiento y prueba
@@ -1545,7 +1571,6 @@ model3 <- lm(price ~ year
               data = split_data_frames$model3_no_outliers_robust_method$training)
 ```
 
-
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Obtener resúmenes y estadísticas adicionales para los modelos
 
@@ -1571,10 +1596,10 @@ glance_model3 <- broom::glance(model3)
 ```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
 print(summary_model)
 ```
+
 ```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
 glance_model2
 ```
-
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Obtener intervalos de confianza para los coeficientes de los modelos
@@ -1590,7 +1615,6 @@ confint_model3 <- confint(model3, level = 0.95)
 
 ```
 
-
 ```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
 # Conjunto de datos de prueba para el Modelo 1
 m1 <- split_data_frames$model1_no_outliers_sd_method$testing
@@ -1599,49 +1623,49 @@ m1 <- split_data_frames$model1_no_outliers_sd_method$testing
 m2 <- split_data_frames$model2_no_outliers_IQR_method$testing 
 
 # Conjunto de datos de prueba para el Modelo 3
-m3 <- split_data_frames$model3_no_outliers_rubust_method$testing
+m3 <- split_data_frames$model3_no_outliers_robust_method$testing
 
 # Crear una lista para los modelos
 models <- list(model = model, model2 = model2, model3 = model3)
 
 
-class(m3)
+class(m1)
 ```
-
 
 ```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
-# # Crear una lista para el conjunto de prueba
-# datasets <- list(m1 = m1, m2 = m2, m3 = m3)
-# 
-# # Función para añadir predicciones a los datos
-# add_predictions <- function(dataset, model) {
-#     dataset$predicted <- predict(object = model, newdata = dataset)
-#     dataset
-# }
-# 
-# # Aplicar la función a cada combinación de conjunto de datos y modelo
-# datasets <- mapply(add_predictions, datasets, models, SIMPLIFY = FALSE)
-# 
-# # Función para crear 3 gráficos de paridad
-# create_parity_plot <- function(dataset, name){
-#     
-#     ggplot(dataset, aes(x = price, y = predicted)) +
-#         geom_point() +
-#         geom_abline(color = "red", linetype = "dashed") +
-#         labs(
-#             x = "Precio Observado",
-#             y = "Precio Predicho",
-#             title = paste("Gráfico de Paridad: Precio Observado vs Predicho (", name, ")"),
-#             theme_minimal()
-#         )
-# }
-# 
-# # Aplicar la función de creación de gráficos a cada conjunto de datos
-# plots <- imap(datasets, ~ create_parity_plot(.x, .y))
-# 
-# # Organizar los gráficos en una cuadrícula
-# grid.arrange(grobs = plots, ncol = 3)
+# Crear una lista para el conjunto de prueba
+datasets <- list(m1 = m1, m2 = m2, m3 = m3)
+
+# Función para añadir predicciones a los datos
+add_predictions <- function(dataset, model) {
+ dataset$predicted <- predict(object = model, newdata = dataset)
+ dataset
+}
+
+# Aplicar la función a cada combinación de conjunto de datos y modelo
+datasets <- mapply(add_predictions, datasets, models, SIMPLIFY = FALSE)
+
+# Función para crear 3 gráficos de paridad
+create_parity_plot <- function(dataset, name){
+ 
+ ggplot(dataset, aes(x = price, y = predicted)) +
+     geom_point() +
+     geom_abline(color = "red", linetype = "dashed") +
+     labs(
+         x = "Precio Observado",
+         y = "Precio Predicho",
+         title = paste("Gráfico de Paridad: Precio Observado vs Predicho (", name, ")"),
+         theme_minimal()
+     )
+}
+
+# Aplicar la función de creación de gráficos a cada conjunto de datos
+plots <- imap(datasets, ~ create_parity_plot(.x, .y))
+
+# Organizar los gráficos en una cuadrícula
+grid.arrange(grobs = plots, ncol = 3)
 ```
+
 ```{r}
 # Crear una lista para el conjunto de prueba
 datasets <- list(m1 = m1, m2 = m2, m3 = m3)
@@ -1678,7 +1702,6 @@ grid.arrange(grobs = plots, ncol = 3)
 
 ```
 
-
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Valores Predichos
 
@@ -1703,7 +1726,6 @@ results   <- map2(datasets, models, calc_metrics)
 metrics_df <-  do.call(rbind, lapply(results, as.data.frame))
 ```
 
-
 ```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
 print(results )
 ```
@@ -1711,7 +1733,6 @@ print(results )
 ```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
 print(metrics_df)
 ```
-
 
 ```{r, message=FALSE , warning=FALSE, rows.print = 5}
 # Almacenando los Resultados
@@ -1733,5 +1754,3 @@ model2_f             <- left_join(tidy_summary_model2,
 write_rds(x = model2_f, file = "01_Informacion_Data/Models_Data/model2_f")
 write_rds(x = tidy_summary_model2, file = "01_Informacion_Data/Models_Data/tidy_summary_model2")
 ```
-
-

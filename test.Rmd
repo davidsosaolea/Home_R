@@ -1,0 +1,615 @@
+---
+title: "test"
+author: "David Sosa Olea"
+date: "2024-01-25"
+output: html_document
+---
+
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
+# Cargar librerías requeridas
+library(ggplot2)   # visualización de datos
+library(caret)     # tareas de aprendizaje automático
+library(tidyverse) # manipulación y visualización de datos
+library(naniar)    # para entender los valores faltantes
+library(purrr)     # para iteraciones
+library(rlang)     # ayuda a convertir un string en un símbolo
+library(lubridate) # ayuda a manejar datos de fechas
+library(gridExtra) # ayuda con la visualización
+library(ggpubr)    # mejora las visualizaciones de gráficos de ggplot2
+library(patchwork) # ayuda a combinar varios gráficos de ggplot2 en un gráfico compuesto
+library(broom)     # ayuda con el ordenamiento de objetos de modelos
+library(Metrics)
+library(plotly)
+
+#setwd("R_class/Analysis_&_Manipulation_De_Datos_En_Espanol/")
+
+#Cargar los datos de listados de alquileres
+rent_data <- read_rds(file = "01_Informacion_Data/Rental_Listing_Data/Rental_Listings.RDS")
+
+# Combinar datos de todos los codigos postales en un unico dataframe
+# El argumento id se utiliza para crear una nueva columna que registra el origen de cada fila.
+
+rent_data_unlist <- rent_data |>
+    bind_rows(.id = "source")
+
+# Preparar los Datos de los modelos
+# Filtrar los datos para incluir solo los códigos postales especificados para el análisis #c("48237", "48069","48067", "48017", "48072", "48220","48030","48221", "48203")
+
+model_data <- rent_data_unlist |>
+    mutate (dates = ymd_hms (lastSeen),
+            year = format(dates, "%Y")) |>
+    select(year, zipCode, price, bathrooms, bedrooms, squareFootage) |>
+    filter (zipCode %in% c("48237", "48069", "48067", "48017", "48072", "48220", "48030", "48221", "48203"))
+
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Data completa
+dim(model_data)
+
+```
+```{r,echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
+model_data <- model_data |> na.omit()
+
+```
+
+## Identificar valores atípicos utilizando la desviación estándar (SD)
+
+Eliminar valores atípicos utilizando la desviación estándar (SD) es un enfoque común en estadística para identificar y tratar puntos de datos que se desvían significativamente de la media de un conjunto de datos. El método implica calcular la desviación estándar de los datos y eliminar los valores que están a una cierta distancia (múltiplos de la desviación estándar) de la media.
+
+Aquí hay una descripción básica de cómo funciona este método:
+
+Calcular la Media y la Desviación Estándar:
+
+Se calcula la media (promedio) y la desviación estándar de los datos. Establecer un Umbral:
+
+Se elige un múltiplo de la desviación estándar como umbral. Comúnmente, se utilizan múltiplos como 1, 1.5, 2, o 3, dependiendo de la rigurosidad que se desee aplicar. Identificar y Eliminar Valores Atípicos:
+
+Se identifican los valores que están más allá del umbral establecido en ambos extremos de la distribución (por encima y por debajo de la media). Estos valores se consideran atípicos y se eliminan del conjunto de datos. Revisar y Validar:
+
+Después de eliminar los valores atípicos, es importante revisar el conjunto de datos resultante y considerar si la exclusión de esos valores es justificada. En algunos casos, los valores atípicos pueden contener información importante o representar eventos genuinos. Es importante destacar que este método asume que los datos siguen una distribución normal.
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Calcular la media y la desviación estándar de la columna 'price' en el DataFrame 'model_data'
+mean_price <- mean(model_data$price, na.rm = T)  # Calcular la media, ignorando los valores NA
+sd_price <- sd(model_data$price, na.rm = T)  # Calcular la desviación estándar, ignorando los valores NA
+
+# Identificar los valores atípicos basados en la desviación estándar (3 veces la desviación estándar)
+outliers <- model_data$price < (mean_price - 3 * sd_price) | model_data$price > (mean_price + 3 * sd_price)
+
+# Crear un nuevo DataFrame 'model1_no_outliers_sd_method' sin los valores atípicos
+model1_no_outliers_sd_method <- model_data[!outliers, ]
+
+# Mostrar información sobre el nuevo DataFrame utilizando la función 'glimpse()'
+model1_no_outliers_sd_method |> glimpse()
+
+```
+
+## Eliminar valores atipicos con el metodo IQR
+
+Eliminar valores atípicos con el método IQR (rango intercuartílico) es otra técnica común en estadística. El rango intercuartílico es la diferencia entre el tercer cuartil (Q3) y el primer cuartil (Q1) de un conjunto de datos. Los valores atípicos se identifican y eliminan si están por debajo de Q1 - 1.5 \* IQR o por encima de Q3 + 1.5  IQR. Aquí hay un ejemplo de cómo implementar esto en R:
+
+
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Calcular el primer cuartil (Q1)
+Q1 <- quantile(model_data$price, 0.25)
+
+# Calcular el tercer cuartil (Q3)
+Q3 <- quantile(model_data$price, 0.75)
+
+# Calcular el rango intercuartílico (IQR)
+IQR <- Q3 - Q1
+
+# Identificar los valores atípicos utilizando el método IQR
+outliers <- model_data$price < (Q1 - 1.5 * IQR) | model_data$price > (Q3 + 1.5 * IQR)
+
+# Crear un nuevo DataFrame sin valores atípicos
+model2_no_outliers_IQR_method <- model_data[!outliers, ]
+
+# Mostrar información sobre el nuevo DataFrame sin valores atípicos
+glimpse(model2_no_outliers_IQR_method)
+
+```
+
+## Usar método Robustos
+
+El Método de Desviación Absoluta de la Mediana (Median Absolute Deviation, MAD) es un enfoque robusto utilizado para identificar valores atípicos en un conjunto de datos. A diferencia de otros métodos que dependen de la media y la desviación estándar, el MAD utiliza la mediana como medida central y evalúa la dispersión de los datos en términos de desviaciones absolutas respecto a la mediana.
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Calcular la Desviación Absoluta de la Mediana (MAD)
+MAD <- mad(model_data$price, constant = 1)
+
+# Identificar valores atípicos utilizando el método robusto MAD
+outliers <- abs(model_data$price - median(model_data$price)) / MAD > 2
+
+# Crear un nuevo DataFrame sin valores atípicos utilizando el método robusto
+model3_no_outliers_robust_method <- model_data[!outliers, ]
+
+# Mostrar información sobre el nuevo DataFrame sin valores atípicos
+model3_no_outliers_robust_method |> glimpse()
+
+```
+
+# Comprobación de linealidad
+
+La comprobación de linealidad se refiere a la evaluación de la relación entre variables en un modelo estadístico o matemático para determinar si esta relación es lineal. En el contexto de análisis de regresión, la linealidad es una suposición fundamental. La comprobación de linealidad implica asegurarse de que la relación entre la variable dependiente y las variables independientes pueda ser bien aproximada mediante una línea recta.
+
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
+library(gridExtra)
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Lista de variables a incluir en los gráficos de dispersión
+variables <- list("bathrooms", "bedrooms", "squareFootage", "zipCode")
+
+# Función para crear gráficos de dispersión
+create_scatter_plot_fun <- function(variables) {
+    ggplot(model1_no_outliers_sd_method, aes(!!sym(variables), price)) +
+        geom_point() +  # Añadir puntos al gráfico
+        labs(title = paste("Gráfico de dispersión de precio vs", variables),
+             x = variables,
+             y = "Precio")
+}
+
+# Crear una lista de gráficos utilizando la función map
+plots <- map(variables, create_scatter_plot_fun)
+
+# Organizar los gráficos en una cuadrícula
+grid.arrange(plots[[1]], plots[[2]], plots[[3]], plots[[4]], ncol = 2)
+
+```
+
+# Gráficos de Residuos
+
+Los gráficos de residuos son herramientas visuales utilizadas en el análisis de regresión para evaluar la calidad del ajuste de un modelo a los datos observados. Los residuos son las diferencias entre los valores observados y los valores predichos por el modelo. Al examinar los patrones y distribuciones de estos residuos, se pueden identificar posibles violaciones de las suposiciones del modelo de regresión.
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Lista de conjuntos de datos que contienen modelos sin valores atípicos
+data_sets <- list(
+    "model1_no_outliers_sd_method" = model1_no_outliers_sd_method,
+    "model2_no_outliers_IQR_method" = model2_no_outliers_IQR_method,
+    "model3_no_outliers_robust_method" = model3_no_outliers_robust_method
+)
+
+# Fórmula del modelo de regresión lineal
+formula <- price ~ bathrooms + bedrooms + squareFootage + zipCode
+
+# Ajustar modelos de regresión lineal a cada conjunto de datos
+models <- map(data_sets, ~ lm(formula, data = .x))
+
+# Función para crear gráficos de residuos vs valores ajustados
+create_residuals_plot_fun <- function(model, model_name) {
+  ggplot() +
+    geom_point(aes(x = model$fitted.values, y = model$residuals)) +
+    labs(
+      title = paste("Residuos vs Valores Ajustados para", model_name),
+      x = "Valores Ajustados",
+      y = "Residuos"
+    )
+}
+
+# Crear gráficos de residuos vs valores ajustados para cada modelo
+plots <- map2(models, names(models), create_residuals_plot_fun)
+
+# Organizar los gráficos en una cuadrícula de 2 columnas
+grid.arrange(plots[[1]], plots[[2]], plots[[3]], ncol = 2)
+
+```
+
+## Normal Q - Q
+
+Un Q-Q plot compara la distribución de los residuos con una distribución teórica (generalmente la distribución normal). Si los puntos del Q-Q plot siguen aproximadamente una línea diagonal, sugiere que los residuos se distribuyen de manera normal.
+
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
+# Lista de modelos de regresión lineal ajustados a conjuntos de datos específicos
+library(ggpubr)
+library(cowplot)
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Lista de modelos de regresión lineal ajustados a conjuntos de datos específicos
+models <- list(
+  "model1_no_outliers_sd_method" = lm(price ~ bathrooms + bedrooms + squareFootage + zipCode, data = model1_no_outliers_sd_method),
+  "model2_no_outliers_IQR_method" = lm(price ~ bathrooms + bedrooms + squareFootage + zipCode, data = model2_no_outliers_IQR_method),
+  "model3_no_outliers_robust_method" = lm(price ~ bathrooms + bedrooms + squareFootage + zipCode, data = model3_no_outliers_robust_method)
+)
+
+# Función para crear gráficos Q-Q plot para los residuos de un modelo
+create_qq_plot <- function(model_name, model) {
+  residuals <- model$residuals
+  qqplot <- ggqqplot(residuals) +
+    ggtitle(paste("Gráfico Q-Q para", model_name))
+  return(qqplot)
+}
+
+# Crear gráficos Q-Q plot para cada modelo
+plots <- map2(names(models), models, create_qq_plot)
+
+# Organizar los gráficos en una cuadrícula de 2 columnas usando plot_grid
+combined_plot <- plot_grid(plotlist = plots, ncol = 2)
+print(combined_plot)
+
+```
+
+# Coeficiente de correlación
+
+El coeficiente de correlación es una medida estadística que cuantifica la relación lineal entre dos variables. En otras palabras, el coeficiente de correlación indica en qué medida las variaciones en una variable están asociadas con las variaciones en otra variable. Esta medida se utiliza comúnmente para evaluar la fuerza y dirección de la relación entre dos variables continuas.
+
+Existen diferentes tipos de coeficientes de correlación, pero uno de los más comunes es el coeficiente de correlación de Pearson. El coeficiente de correlación de Pearson, denotado como "r", tiene un rango de -1 a 1, donde:
+
+-   1: Indica una correlación perfecta positiva. Esto significa que a medida que una variable aumenta, la otra variable también aumenta en una relación lineal perfecta.
+
+-   0: Indica ausencia de correlación lineal. No hay relación lineal entre las dos variables.
+
+-   -1: Indica una correlación perfecta negativa. Esto significa que a medida que una variable aumenta, la otra variable disminuye en una relación lineal perfecta.
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Calcular el coeficiente de correlación entre price y bathrooms
+cor_bathrooms <- cor(model1_no_outliers_sd_method$price, model1_no_outliers_sd_method$bathrooms, use = "complete.obs")
+print(paste("Coeficiente de correlación entre price y bathrooms:", cor_bathrooms))
+
+# Calcular el coeficiente de correlación entre price y bedrooms
+cor_bedrooms <- cor(model1_no_outliers_sd_method$price, model1_no_outliers_sd_method$bedrooms, use = "complete.obs")
+print(paste("Coeficiente de correlación entre price y bedrooms:", cor_bedrooms))
+
+# Calcular el coeficiente de correlación entre price y squareFootage
+cor_squareFootage <- cor(model1_no_outliers_sd_method$price, model1_no_outliers_sd_method$squareFootage, use = "complete.obs")
+print(paste("Coeficiente de correlación entre price y squareFootage:", cor_squareFootage))
+
+```
+
+# Transformaciones de datos
+
+Las transformaciones de datos, como tomar el logaritmo, la raíz cuadrada o elevar al cuadrado, son técnicas utilizadas en el análisis de datos por diversas razones. El propósito principal de estas transformaciones es modificar la distribución de los datos o la relación entre las variables para satisfacer las suposiciones de los métodos estadísticos o mejorar la interpretabilidad de los resultados. Aquí hay algunas razones comunes para realizar transformaciones:
+
+-   **Estabilizar la Varianza:**
+
+En el análisis de regresión, se asume que la varianza de los errores es constante en todos los niveles de las variables predictoras. Si hay una relación no constante entre la varianza y las variables predictoras, las transformaciones como la raíz cuadrada o el logaritmo pueden ayudar a estabilizar la varianza.
+
+-   **Linearizar Relaciones No Lineales:**
+
+En algunos casos, la relación entre las variables puede ser no lineal, pero los modelos estadísticos asumen una relación lineal. Tomar el logaritmo o la raíz cuadrada de una variable puede ayudar a linealizar la relación, permitiendo así que se apliquen modelos lineales.
+
+-   **Manejar Sesgo en la Distribución:**
+
+Si los datos tienen una distribución sesgada hacia la derecha, donde hay valores atípicos que se encuentran en el extremo superior, tomar el logaritmo puede reducir el sesgo y hacer que la distribución sea más simétrica.
+
+-   **Escalamiento:**
+
+Elevar al cuadrado o tomar la raíz cuadrada de una variable puede cambiar la escala de los datos, lo que puede ser útil para resaltar patrones o reducir la importancia de valores extremos.
+
+-   **Condiciones de Normalidad:**
+
+En algunos métodos estadísticos, como las pruebas de hipótesis paramétricas, se asume la normalidad de los datos. Transformaciones como el logaritmo pueden ayudar a que los datos se aproximen más a una distribución normal.
+
+-   **Mejorar la Interpretabilidad:**
+
+En ocasiones, realizar transformaciones puede hacer que los resultados sean más interpretables o más fácilmente comparables. Es importante señalar que la elección de una transformación específica depende de la naturaleza de los datos y de los objetivos del análisis. Además, se debe tener precaución al interpretar resultados transformados, ya que pueden afectar la interpretación de los coeficientes o las métricas de evaluación del modelo. La selección de una transformación adecuada a menudo implica explorar y comprender la naturaleza de los datos.
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Crear un nuevo DataFrame con la transformación logarítmica de squareFootage
+m1_log <- model1_no_outliers_sd_method |>
+  mutate(squareFootage = log(squareFootage))
+
+# Crear un nuevo DataFrame con la transformación de raíz cuadrada de squareFootage
+m1_sqrt <- model1_no_outliers_sd_method |>
+  mutate(squareFootage = sqrt(squareFootage))
+
+# Crear un nuevo DataFrame con la transformación cuadrática de squareFootage
+m1_sq2 <-  model1_no_outliers_sd_method |>
+  mutate(squareFootage = (squareFootage)^2)
+
+# Lista de modelos de regresión lineal con diferentes transformaciones de squareFootage
+models <- list(
+  "model_no_outliers_sd_method" = lm(price ~ bathrooms + bedrooms + squareFootage + zipCode, data = model1_no_outliers_sd_method),
+  "ml_log" = lm(price ~ bathrooms + bedrooms + squareFootage + zipCode, data = m1_log),
+  "m1_sqrt"= lm(price ~ bathrooms + bedrooms + squareFootage + zipCode, data = m1_sqrt),
+  "m1_sq2" = lm(price ~ bathrooms + bedrooms + squareFootage + zipCode, data = m1_sq2)
+)
+
+# Función para crear gráficos de residuos vs valores ajustados
+create_residuals_plot <- function(model_name, model) {
+  ggplot() +
+    geom_point(aes(x = model$fitted.values, y = model$residuals)) +
+    labs(
+      title = paste("Residuos vs Valores Ajustados para", model_name),
+      x = "Valores Ajustados",
+      y = "Residuos"
+    )
+}
+
+# Crear gráficos de residuos vs valores ajustados para cada modelo
+plots <- map2(names(models), models, create_residuals_plot)
+
+# Organizar los gráficos en una cuadrícula de 2 columnas
+grid.arrange(plots[[1]], plots[[2]], plots[[3]], plots[[4]], ncol = 2)
+
+```
+
+# Convertir a factores
+
+En R, "convertir a factores" se refiere a cambiar el tipo de datos de una variable a un factor. Un factor es un tipo de dato en R que representa una variable categórica o cualitativa. Las variables categóricas toman un número limitado y fijo de valores que representan categorías o niveles, y no tienen un orden inherente entre ellos.
+
+Cuando conviertes una variable a factor en R, estás indicando que la variable es categórica y que R debe tratarla como tal. Esto es útil cuando trabajas con variables que representan categorías como nombres de regiones, tamaños, colores, etc.
+
+La función básica para convertir una variable a factor en R es **'as.factor()'**
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Imprimir la estructura de cada conjunto de datos en data_sets utilizando str()
+map(data_sets, str)
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+
+# Definir una función para convertir a factores ciertas columnas en un conjunto de datos
+mutate_data_to_fct <- function(df) {
+  # Utilizar la función mutate_at para aplicar as.factor a las columnas "zipCode" y "year"
+  df <- df |> mutate_at(c("zipCode", "year"), as.factor) 
+  return(df)
+}
+
+# Aplicar la función mutate_data_to_fct a cada conjunto de datos en data_sets usando map
+data_sets <- map(data_sets, mutate_data_to_fct)
+# Imprimir la estructura de cada conjunto de datos en data_sets utilizando str()
+map(data_sets, str)
+
+```
+
+# Partición de Datos
+
+La partición de datos es una técnica común en estadísticas y aprendizaje automático que implica dividir un conjunto de datos en subconjuntos más pequeños para diversos propósitos, como entrenar modelos, validar modelos y evaluar su rendimiento. Las particiones de datos son fundamentales para garantizar la validez y la generalización de los modelos que se construyen.
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Definir una función para dividir los datos en conjuntos de entrenamiento y prueba
+split_data_fun <- function(df, var1, var2) {
+    
+    # Obtener los niveles únicos de las variables var1 y var2
+    levels1 <- unique (df[[var1]])
+    levels2 <- unique (df[[var2]])
+    
+    # Inicializar índices para conjuntos de entrenamiento y prueba
+    training_indices <- c()
+    testing_indices  <- c()
+    
+    # Iterar sobre los niveles de var1 y var2
+    for (level1 in levels1) {
+        for (level2 in levels2) {
+            
+            # Filtrar las filas que coinciden con los niveles actuales de var1 y var2
+            rows <- which(df[[var1]] == level1 & df[[var2]] == level2)
+            
+            # Verificar si solo hay una instancia
+            if (length(rows) < 2 ) {
+                # Si solo hay una instancia, añadirla a los datos de entrenamiento
+                training_indices <- c(training_indices, rows)
+            } else {
+                # Si hay más de una instancia, crear una partición de datos de entrenamiento y prueba
+                partition <- createDataPartition(y = rows, p = 0.70, list = FALSE)
+                training_indices <- c(training_indices, rows[partition])
+                testing_indices <- c(testing_indices, rows[-partition])
+            }
+        }
+    }
+
+    # Devolver una lista con los conjuntos de entrenamiento y prueba
+    list(
+        training = df[training_indices, ],
+        testing = df[testing_indices, ]
+    )
+}
+
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+
+split_data_frames <- map(data_sets, ~ split_data_fun(.x, "year", "zipCode" ))
+
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+
+model <- lm(price ~ year
+            + bathrooms
+            + bedrooms
+            + squareFootage * zipCode, 
+            data = split_data_frames$model1_no_outliers_sd_method$training) 
+
+model2 <- lm(price ~ year
+                 + bathrooms
+                 + bedrooms
+                 + squareFootage * zipCode, 
+             data = split_data_frames$model2_no_outliers_IQR_method$training)
+
+model3 <- lm(price ~ year
+                 + bathrooms
+                 + bedrooms
+                 + squareFootage * zipCode, 
+             data = split_data_frames$model3_no_outliers_robust_method$training)
+
+
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Obtener resúmenes y estadísticas adicionales para los modelos
+
+# Resumen del Modelo 1
+summary_model  <- summary(model)
+
+# Resumen del Modelo 2
+summary_model2 <- summary(model2)
+
+# Resumen del Modelo 3
+summary_model3 <- summary(model3)
+
+# Estadísticas adicionales del Modelo 1
+glance_model  <- broom::glance(model)
+
+# Estadísticas adicionales del Modelo 2
+glance_model2 <- broom::glance(model2)
+
+# Estadísticas adicionales del Modelo 3
+glance_model3 <- broom::glance(model3)
+```
+
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
+print(summary_model)
+```
+
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
+glance_model2
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Obtener intervalos de confianza para los coeficientes de los modelos
+
+# Intervalos de confianza del Modelo 1
+confint_model  <- confint(model, level = 0.95)
+
+# Intervalos de confianza del Modelo 2
+confint_model2 <- confint(model2, level = 0.95)
+
+# Intervalos de confianza del Modelo 3
+confint_model3 <- confint(model3, level = 0.95)
+
+```
+
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
+# Conjunto de datos de prueba para el Modelo 1
+m1 <- split_data_frames$model1_no_outliers_sd_method$testing
+
+# Conjunto de datos de prueba para el Modelo 2
+m2 <- split_data_frames$model2_no_outliers_IQR_method$testing 
+
+# Conjunto de datos de prueba para el Modelo 3
+m3 <- split_data_frames$model3_no_outliers_rubust_method$testing
+
+# Crear una lista para los modelos
+models <- list(model = model, model2 = model2, model3 = model3)
+
+
+class(m1)
+class(m2)
+class(m3)
+```
+
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
+datasets <- list(m1 = m1, m2 = m2, m3 = m3)
+
+# Función para añadir predicciones a los datos
+
+add_preditions <- function(dataset, model) {
+    dataset$predicted <- predict(object = model, newdata = dataset)
+    dataset
+}
+
+datasets <- mapply(add_preditions, datasets, models, SIMPLIFY = FALSE)
+
+# Función para crear 3 gráficos
+
+create_parity_plot <- function(dataset, name){
+    
+    ggplot(dataset, aes (x = price, y = predicted)) +
+        geom_point() +
+        geom_abline(color = "red", linetype = "dashed") +
+        labs(
+            x = "Precio Observado",
+            y = "Precio Predicho",
+            title = paste("Grafico de Paridad: Precio Observado vs Predicho (",name,")") +
+            theme_minimal()
+            )
+}
+
+plots <- imap(datasets, ~ create_parity_plot(.x, .y))
+
+grid.arrange(grobs = plots, ncol = 3)
+```
+
+```{r}
+# Crear una lista para el conjunto de prueba
+datasets <- list(m1 = m1, m2 = m2, m3 = m3)
+
+# Función para añadir predicciones a los datos
+add_predictions <- function(dataset, model) {
+    dataset$predicted <- predict(object = model, newdata = dataset)
+    dataset
+}
+
+# Aplicar la función a cada combinación de conjunto de datos y modelo
+datasets <- mapply(add_predictions, datasets, models, SIMPLIFY = FALSE)
+
+# Función para crear gráficos de paridad
+create_parity_plot <- function(dataset, name){
+    ggplot(dataset, aes(x = price, y = predicted)) +
+        geom_point() +
+        geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
+        labs(
+            x = "Precio Observado",
+            y = "Precio Predicho",
+            title = paste("Gráfico de Paridad: Precio Observado vs Predicho (", name, ")")
+        ) +
+        theme_minimal()
+}
+
+# Aplicar la función de creación de gráficos a cada conjunto de datos
+plots <- imap(datasets, ~ create_parity_plot(.x, .y))
+
+# Imprimir o visualizar los gráficos individualmente para verificar si alguno causa el error
+
+# Organizar los gráficos en una cuadrícula
+grid.arrange(grobs = plots, ncol = 3)
+
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Valores Predichos
+
+calc_metrics <- function(dataset, model) {
+    
+    predictions <- predict(object = model, newdata = dataset)
+    actuals     <- dataset$price # Reemplazar 'price' con el nombre de la variable de respuesta
+    
+    metrics <- list()
+    
+    # Cacula tus metricas aqui, luego asignalas a lista
+    metrics$Model = deparse(substitute (model))
+    metrics$MAE   = mae (actual = actuals, predicted = predictions)
+    metrics$MSE   = mse (actual = actuals, predicted = predictions)
+    metrics$RMSE  = rmse(actual = actuals, predicted = predictions)
+    metrics$MAPE  = mape(actual = actuals, predicted = predictions) 
+    return(metrics)
+}
+
+results   <- map2(datasets, models, calc_metrics)
+
+metrics_df <-  do.call(rbind, lapply(results, as.data.frame))
+```
+
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
+print(results )
+```
+
+```{r, echo=FALSE, message=FALSE , warning=FALSE, rows.print = 5}
+print(metrics_df)
+```
+
+```{r, message=FALSE , warning=FALSE, rows.print = 5}
+# Almacenando los Resultados
+
+model2_metrics <- metrics_df |> slice(2)
+
+# intervalos de confianza
+
+confint_df2  <-  as.data.frame(confint_model2)
+confint_df2  <- confint_df2 |> rownames_to_column("Term")
+m2_confint_tibble <- as_tibble(confint_df2)
+
+# resultados del modelo
+
+tidy_summary_model2  <- tidy(summary_model2)
+model2_f             <- left_join(tidy_summary_model2,
+                                  m2_confint_tibble, by = c("term" = "Term"))
+
+write_rds(x = model2_f, file = "01_Informacion_Data/Models_Data/model2_f")
+write_rds(x = tidy_summary_model2, file = "01_Informacion_Data/Models_Data/tidy_summary_model2")
+```
